@@ -75,10 +75,10 @@ class ItAsset(models.Model):
     assigned_date = fields.Date(compute="_compute_current_assignment", store=True)
     assignment_count = fields.Integer(compute="_compute_assignment_count")
 
-    _sql_constraints = [
-        ("serial_company_uniq", "unique(serial_no, company_id)",
-         "This serial number already exists for another IT asset in this company!"),
-    ]
+    _serial_company_uniq = models.Constraint(
+        "unique(serial_no, company_id)",
+        "This serial number already exists for another IT asset in this company!",
+    )
 
     # ------------------------------------------------------------------
     # Computes

@@ -117,7 +117,7 @@ class ItAssetPortal(CustomerPortal):
     def _it_purchase_orders(self):
         return request.env["purchase.order"].sudo().search([
             ("company_id", "in", self._it_company_ids()),
-            ("state", "in", ("purchase", "done"))], order="date_order desc, id desc", limit=300)
+            ("state", "=", "purchase")], order="date_order desc, id desc", limit=300)
 
     def _it_vendors(self):
         return request.env["res.partner"].sudo().search(

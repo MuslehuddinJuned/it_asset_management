@@ -1,6 +1,6 @@
 {
     "name": "IT Asset Management",
-    "version": "18.0.1.0.0",
+    "version": "19.0.1.0.0",
     "summary": "Track IT assets by serial number, assign them to employees "
                "with full history and link them to Purchase Orders",
     "description": """

@@ -86,7 +86,7 @@
                 <separator/>
                 <filter name="date_assigned" string="Assigned Date" date="date_assigned"/>
                 <filter name="date_returned" string="Returned Date" date="date_returned"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="group_asset" string="Asset" context="{'group_by': 'asset_id'}"/>
                     <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
                     <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>

@@ -215,7 +215,7 @@
                 <filter name="with_po" string="Linked to PO" domain="[('purchase_order_id', '!=', False)]"/>
                 <separator/>
                 <filter name="inactive" string="Archived" domain="[('active', '=', False)]"/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
                     <filter name="group_category" string="Category" context="{'group_by': 'category_id'}"/>
                     <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
@@ -246,7 +246,7 @@
         <field name="model_id" ref="model_it_asset"/>
         <field name="binding_model_id" ref="model_it_asset"/>
         <field name="binding_view_types">list</field>
-        <field name="groups_id" eval="[(4, ref('mj_it_asset.group_it_asset_manager'))]"/>
+        <field name="group_ids" eval="[(4, ref('mj_it_asset.group_it_asset_manager'))]"/>
         <field name="state">code</field>
         <field name="code">action = records.action_open_assign_wizard()</field>
     </record>
@@ -256,7 +256,7 @@
         <field name="model_id" ref="model_it_asset"/>
         <field name="binding_model_id" ref="model_it_asset"/>
         <field name="binding_view_types">list</field>
-        <field name="groups_id" eval="[(4, ref('mj_it_asset.group_it_asset_manager'))]"/>
+        <field name="group_ids" eval="[(4, ref('mj_it_asset.group_it_asset_manager'))]"/>
         <field name="state">code</field>
         <field name="code">action = records.action_open_return_wizard()</field>
     </record>

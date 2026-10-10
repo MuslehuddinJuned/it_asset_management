@@ -71,7 +71,9 @@ class ItAssetAssignment(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        Employee = self.env["hr.employee"]
+        # Odoo 19: department/job live on hr.version (HR rights needed) -> read the
+        # snapshot with sudo; nothing else from HR is exposed.
+        Employee = self.env["hr.employee"].sudo()
         for vals in vals_list:
             if vals.get("employee_id"):
                 emp = Employee.browse(vals["employee_id"])
@@ -85,14 +87,15 @@ class ItAssetAssignment(models.Model):
     @api.onchange("employee_id")
     def _onchange_employee_id(self):
         for rec in self:
-            rec.department_id = rec.employee_id.department_id
-            rec.job_id = rec.employee_id.job_id
+            emp = rec.employee_id.sudo()
+            rec.department_id = emp.department_id
+            rec.job_id = emp.job_id
 
     def write(self, vals):
         if "asset_id" in vals and any(rec.asset_id.id != vals["asset_id"] for rec in self):
             raise ValidationError(_("The asset of an assignment line cannot be changed."))
         if vals.get("employee_id"):
-            emp = self.env["hr.employee"].browse(vals["employee_id"])
+            emp = self.env["hr.employee"].sudo().browse(vals["employee_id"])
             vals.setdefault("department_id", emp.department_id.id)
             vals.setdefault("job_id", emp.job_id.id)
         old_employees = {rec.id: rec.employee_id for rec in self}

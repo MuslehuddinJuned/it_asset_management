@@ -2,8 +2,8 @@
 IT Asset Management
 =====================
 
-.. |badge1| image:: https://img.shields.io/badge/odoo-18.0-875A7B.svg
-    :alt: Odoo 18.0
+.. |badge1| image:: https://img.shields.io/badge/odoo-19.0-875A7B.svg
+    :alt: Odoo 19.0
 .. |badge2| image:: https://img.shields.io/badge/licence-LGPL--3-blue.svg
     :target: https://www.gnu.org/licenses/lgpl-3.0-standalone.html
     :alt: License: LGPL-3
@@ -114,8 +114,9 @@ Usage
 Technical notes
 ===============
 
-* Developed and tested on Odoo 18.0 (Community & Enterprise).
-* Odoo 18 UI: ``<list>`` views, new ``<chatter/>``, kanban ``card`` template.
+* Developed and tested on Odoo 19.0 (Community & Enterprise).
+* Odoo 19 security model: *privileges* (``res.groups.privilege``), ``group_ids``, ``models.Constraint``.
+* Compatible with the Odoo 19 employee *versions* (department / job snapshot) and the Purchase Order lock flag.
 * Standalone models: ``it.asset``, ``it.asset.assignment``, ``it.asset.category``; no dependency on Products or Accounting Assets.
 * Depends on ``hr``, ``purchase``, ``portal`` and ``mail`` - all available in Odoo Community.
 * Portal pages check access explicitly (manager / employee / company) before reading or writing records.

@@ -14,14 +14,14 @@ class TestItAssetPortal(HttpCase):
         # Portal manager (toggle on the user form)
         cls.mgr = cls.env["res.users"].create({
             "name": "Portal IT Manager", "login": "it_portal_mgr", "password": "it_portal_mgr",
-            "groups_id": [(6, 0, [portal.id])],
+            "group_ids": [(6, 0, [portal.id])],
         })
         cls.mgr.it_asset_portal_manager = True
 
         # Portal employee, linked through the employee's work contact
         cls.emp_user = cls.env["res.users"].create({
             "name": "Portal Employee", "login": "it_portal_emp", "password": "it_portal_emp",
-            "groups_id": [(6, 0, [portal.id])],
+            "group_ids": [(6, 0, [portal.id])],
         })
         cls.emp = cls.env["hr.employee"].create({
             "name": "Portal Employee", "work_contact_id": cls.emp_user.partner_id.id})
@@ -30,7 +30,7 @@ class TestItAssetPortal(HttpCase):
         # Portal user with no link at all
         cls.stranger = cls.env["res.users"].create({
             "name": "Stranger", "login": "it_portal_x", "password": "it_portal_x",
-            "groups_id": [(6, 0, [portal.id])],
+            "group_ids": [(6, 0, [portal.id])],
         })
 
     def _post(self, url, data):
@@ -186,7 +186,7 @@ class TestItAssetPortal(HttpCase):
         """Internal IT Asset Users see all assets on the portal but cannot manage."""
         self.env["res.users"].create({
             "name": "IT Reader", "login": "it_reader_p", "password": "it_reader_p",
-            "groups_id": [(6, 0, [self.env.ref("base.group_user").id,
+            "group_ids": [(6, 0, [self.env.ref("base.group_user").id,
                                   self.env.ref("mj_it_asset.group_it_asset_user").id])]})
         asset = self.env["it.asset"].create({
             "name": "RO Laptop", "serial_no": "RO-1", "category_id": self.category.id})

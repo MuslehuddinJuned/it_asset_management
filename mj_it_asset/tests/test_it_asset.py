@@ -174,7 +174,7 @@ class TestItAsset(TransactionCase):
         from odoo.exceptions import AccessError
         manager = self.env["res.users"].create({
             "name": "IT Manager", "login": "itmgr_test",
-            "groups_id": [(6, 0, [self.env.ref("mj_it_asset.group_it_asset_manager").id])]})
+            "group_ids": [(6, 0, [self.env.ref("mj_it_asset.group_it_asset_manager").id])]})
         self.assertFalse(manager.has_group("base.group_system"))
         self._assign(self.asset, self.emp_a)
         for rec in (self.asset, self.asset.assignment_ids, self.category):
@@ -220,10 +220,10 @@ class TestItAsset(TransactionCase):
         from odoo.exceptions import AccessError
         user = self.env["res.users"].create({
             "name": "IT Reader", "login": "it_reader_test", "email": "reader@example.com",
-            "groups_id": [(6, 0, [self.env.ref("mj_it_asset.group_it_asset_user").id])]})
+            "group_ids": [(6, 0, [self.env.ref("mj_it_asset.group_it_asset_user").id])]})
         manager = self.env["res.users"].create({
             "name": "IT Boss", "login": "it_boss_test", "email": "boss@example.com",
-            "groups_id": [(6, 0, [self.env.ref("mj_it_asset.group_it_asset_manager").id])]})
+            "group_ids": [(6, 0, [self.env.ref("mj_it_asset.group_it_asset_manager").id])]})
         self.assertTrue(self.asset.with_user(user).name)          # can read
         with self.assertRaises(AccessError):
             self.asset.with_user(user).write({"brand": "X"})

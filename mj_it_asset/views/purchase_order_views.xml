@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
                 <button name="action_create_it_assets" type="object" string="Create IT Assets"
-                        invisible="state not in ('purchase', 'done')"
+                        invisible="state != 'purchase'"
                         groups="mj_it_asset.group_it_asset_manager"/>
             </xpath>
             <div name="button_box" position="inside">
