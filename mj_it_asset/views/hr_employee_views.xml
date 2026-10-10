@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_employee_form_it_asset" model="ir.ui.view">
+        <field name="name">hr.employee.form.it.asset</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_view_it_assets" type="object" class="oe_stat_button"
+                        icon="fa-laptop" groups="mj_it_asset.group_it_asset_user">
+                    <field name="it_asset_count" widget="statinfo" string="IT Assets"/>
+                </button>
+            </div>
+            <notebook position="inside">
+                <page string="IT Assets" name="it_assets" groups="mj_it_asset.group_it_asset_user">
+                    <div class="mb-2" invisible="it_asset_count == 0"
+                         groups="mj_it_asset.group_it_asset_manager">
+                        <button name="action_reassign_it_assets" type="object"
+                                string="Re-assign All to Another Employee" class="btn-primary me-2"/>
+                        <button name="action_return_it_assets" type="object"
+                                string="Return All to IT" class="btn-secondary"/>
+                    </div>
+                    <separator string="Currently Assigned"/>
+                    <field name="it_asset_ids" readonly="1">
+                        <list>
+                            <field name="code"/>
+                            <field name="name"/>
+                            <field name="serial_no"/>
+                            <field name="category_id"/>
+                            <field name="assigned_date"/>
+                        </list>
+                    </field>
+                    <separator string="History"/>
+                    <field name="it_assignment_ids">
+                        <list create="false" delete="false"
+                              decoration-success="state == 'active'" decoration-muted="state == 'returned'">
+                            <field name="asset_code"/>
+                            <field name="asset_id"/>
+                            <field name="serial_no"/>
+                            <field name="date_assigned"/>
+                            <field name="date_returned"/>
+                            <field name="return_reason"/>
+                            <field name="state" widget="badge" decoration-success="state == 'active'"/>
+                        </list>
+                    </field>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>

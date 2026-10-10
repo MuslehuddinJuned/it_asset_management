@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_it_asset_root" name="IT Assets" sequence="60"
+              web_icon="mj_it_asset,static/description/icon.png"
+              groups="mj_it_asset.group_it_asset_user"/>
+
+    <menuitem id="menu_it_asset_main" name="Assets" parent="menu_it_asset_root" sequence="10"/>
+    <menuitem id="menu_it_asset" name="IT Assets" parent="menu_it_asset_main"
+              action="action_it_asset" sequence="10"/>
+    <menuitem id="menu_it_asset_assignment" name="Assignment History" parent="menu_it_asset_main"
+              action="action_it_asset_assignment" sequence="20"/>
+
+    <menuitem id="menu_it_asset_config" name="Configuration" parent="menu_it_asset_root"
+              sequence="100" groups="mj_it_asset.group_it_asset_manager"/>
+    <menuitem id="menu_it_asset_category" name="Categories" parent="menu_it_asset_config"
+              action="action_it_asset_category" sequence="10"/>
+</odoo>

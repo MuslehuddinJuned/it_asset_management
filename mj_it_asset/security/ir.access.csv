@@ -1,0 +1,20 @@
+id,name,model_id,group_id/id,operation,domain
+access_it_asset_user,it.asset.user,it.asset,mj_it_asset.group_it_asset_user,r,
+access_it_asset_manager,it.asset.manager,it.asset,mj_it_asset.group_it_asset_manager,cru,
+access_it_asset_admin,it.asset.settings.admin,it.asset,base.group_system,crud,
+access_it_asset_category_user,it.asset.category.user,it.asset.category,mj_it_asset.group_it_asset_user,r,
+access_it_asset_category_manager,it.asset.category.manager,it.asset.category,mj_it_asset.group_it_asset_manager,cru,
+access_it_asset_category_admin,it.asset.category.settings.admin,it.asset.category,base.group_system,crud,
+access_it_asset_assignment_user,it.asset.assignment.user,it.asset.assignment,mj_it_asset.group_it_asset_user,r,
+access_it_asset_assignment_manager,it.asset.assignment.manager,it.asset.assignment,mj_it_asset.group_it_asset_manager,cru,
+access_it_asset_assignment_admin,it.asset.assignment.settings.admin,it.asset.assignment,base.group_system,crud,
+access_it_asset_assign_wizard_user,it.asset.assign.wizard.user,it.asset.assign.wizard,mj_it_asset.group_it_asset_user,r,
+access_it_asset_assign_wizard_manager,it.asset.assign.wizard.manager,it.asset.assign.wizard,mj_it_asset.group_it_asset_manager,crud,
+access_it_asset_return_wizard_user,it.asset.return.wizard.user,it.asset.return.wizard,mj_it_asset.group_it_asset_user,r,
+access_it_asset_return_wizard_manager,it.asset.return.wizard.manager,it.asset.return.wizard,mj_it_asset.group_it_asset_manager,crud,
+access_it_asset_po_wizard_user,it.asset.po.wizard.user,it.asset.po.wizard,mj_it_asset.group_it_asset_user,r,
+access_it_asset_po_wizard_manager,it.asset.po.wizard.manager,it.asset.po.wizard,mj_it_asset.group_it_asset_manager,crud,
+access_it_asset_po_wizard_line_user,it.asset.po.wizard.line.user,it.asset.po.wizard.line,mj_it_asset.group_it_asset_user,r,
+access_it_asset_po_wizard_line_manager,it.asset.po.wizard.line.manager,it.asset.po.wizard.line,mj_it_asset.group_it_asset_manager,crud,
+it_asset_company_rule,IT Asset: multi-company,it.asset,,crud,"[('company_id', 'in', company_ids)]"
+it_asset_assignment_company_rule,IT Asset Assignment: multi-company,it.asset.assignment,,crud,"[('company_id', 'in', company_ids)]"

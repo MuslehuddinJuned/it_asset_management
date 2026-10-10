@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_it_asset_assign_wizard_form" model="ir.ui.view">
+        <field name="name">it.asset.assign.wizard.form</field>
+        <field name="model">it.asset.assign.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Assign / Re-assign IT Assets">
+                <group>
+                    <group>
+                        <field name="employee_id" options="{'no_create': True}"/>
+                        <field name="date_assigned"/>
+                        <field name="condition"/>
+                    </group>
+                    <group invisible="not has_assigned">
+                        <field name="has_assigned" invisible="1"/>
+                        <field name="previous_reason" required="has_assigned"/>
+                        <div colspan="2" class="text-muted">
+                            Assets already held by someone will be closed in their
+                            history with this reason and handed over to the new employee.
+                        </div>
+                    </group>
+                </group>
+                <field name="asset_ids" options="{'no_create': True}">
+                    <list>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="serial_no"/>
+                        <field name="category_id"/>
+                        <field name="employee_id" string="Current Holder"/>
+                        <field name="state" widget="badge"/>
+                    </list>
+                </field>
+                <field name="note" placeholder="Hand-over note (accessories given, etc.)"/>
+                <footer>
+                    <button name="action_confirm" type="object" string="Confirm" class="btn-primary"/>
+                    <button special="cancel" string="Cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

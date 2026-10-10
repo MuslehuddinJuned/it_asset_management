@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_it_asset_po_wizard_form" model="ir.ui.view">
+        <field name="name">it.asset.po.wizard.form</field>
+        <field name="model">it.asset.po.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create IT Assets from Purchase Order">
+                <div class="text-muted mb-2">
+                    One line is proposed per ordered unit not yet registered as an IT asset.
+                    Enter the serial number of each unit and remove lines that are not IT assets.
+                </div>
+                <group>
+                    <group>
+                        <field name="purchase_order_id" force_save="1"/>
+                    </group>
+                    <group>
+                        <field name="category_id" options="{'no_create': True}"/>
+                        <field name="warranty_expiry"/>
+                    </group>
+                </group>
+                <field name="line_ids">
+                    <list editable="bottom">
+                        <field name="purchase_line_id" readonly="1" force_save="1"
+                               options="{'no_open': True}" optional="show"/>
+                        <field name="name"/>
+                        <field name="serial_no" required="1"/>
+                        <field name="category_id" options="{'no_create': True}"/>
+                        <field name="brand" optional="show"/>
+                        <field name="model_no" optional="show"/>
+                        <field name="warranty_expiry" optional="hide"/>
+                        <field name="purchase_value" optional="show"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_confirm" type="object" string="Create Assets" class="btn-primary"/>
+                    <button special="cancel" string="Cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_it_asset_assignment_tree" model="ir.ui.view">
+        <field name="name">it.asset.assignment.tree</field>
+        <field name="model">it.asset.assignment</field>
+        <field name="arch" type="xml">
+            <list create="false" decoration-success="state == 'active'" decoration-muted="state == 'returned'">
+                <field name="asset_code"/>
+                <field name="asset_id"/>
+                <field name="serial_no"/>
+                <field name="category_id" optional="show"/>
+                <field name="employee_id"/>
+                <field name="department_id" optional="show"/>
+                <field name="job_id" optional="hide"/>
+                <field name="date_assigned"/>
+                <field name="date_returned"/>
+                <field name="duration_days" optional="show"/>
+                <field name="condition_out" optional="hide"/>
+                <field name="condition_in" optional="hide"/>
+                <field name="return_reason" optional="show"/>
+                <field name="assigned_by" widget="many2one_avatar_user" optional="hide"/>
+                <field name="returned_by" widget="many2one_avatar_user" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge" decoration-success="state == 'active'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_it_asset_assignment_form" model="ir.ui.view">
+        <field name="name">it.asset.assignment.form</field>
+        <field name="model">it.asset.assignment</field>
+        <field name="arch" type="xml">
+            <form create="false">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-info mb-3" role="status">
+                        Corrections are allowed. Every change is logged in the chatter below.
+                        To hand the asset over or return it, use the buttons on the asset.
+                    </div>
+                    <group>
+                        <group string="Asset">
+                            <field name="asset_id" readonly="1"/>
+                            <field name="serial_no"/>
+                            <field name="category_id"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                        <group string="Employee">
+                            <field name="employee_id" options="{'no_create': True}"/>
+                            <field name="department_id" options="{'no_create': True}"/>
+                            <field name="job_id" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Hand-over">
+                            <field name="date_assigned"/>
+                            <field name="assigned_by" options="{'no_create': True}"/>
+                            <field name="condition_out"/>
+                            <field name="assign_note"/>
+                        </group>
+                        <group string="Return" invisible="state == 'active'">
+                            <field name="date_returned" required="state == 'returned'"/>
+                            <field name="returned_by" options="{'no_create': True}"/>
+                            <field name="return_reason"/>
+                            <field name="condition_in"/>
+                            <field name="duration_days"/>
+                            <field name="return_note"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_it_asset_assignment_search" model="ir.ui.view">
+        <field name="name">it.asset.assignment.search</field>
+        <field name="model">it.asset.assignment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="asset_id"/>
+                <field name="serial_no"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <filter name="active_assign" string="In Use" domain="[('state', '=', 'active')]"/>
+                <filter name="returned" string="Returned" domain="[('state', '=', 'returned')]"/>
+                <separator/>
+                <filter name="date_assigned" string="Assigned Date" date="date_assigned"/>
+                <filter name="date_returned" string="Returned Date" date="date_returned"/>
+                <group>
+                    <filter name="group_asset" string="Asset" context="{'group_by': 'asset_id'}"/>
+                    <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="group_reason" string="Return Reason" context="{'group_by': 'return_reason'}"/>
+                    <filter name="group_category" string="Category" context="{'group_by': 'category_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_it_asset_assignment" model="ir.actions.act_window">
+        <field name="name">Assignment History</field>
+        <field name="res_model">it.asset.assignment</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_it_asset_assignment_search"/>
+        <field name="context">{'create': False}</field>
+    </record>
+</odoo>

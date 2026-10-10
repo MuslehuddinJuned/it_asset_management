@@ -1,0 +1,685 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ================================================================
+         Breadcrumbs (the home card is the portal.entry record in
+         data/portal_entry_data.xml since Odoo 20)
+         ================================================================ -->
+
+    <template id="portal_breadcrumbs_it_asset" name="Portal layout: IT asset entries"
+              inherit_id="portal.portal_breadcrumbs" priority="40">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'it_asset'" class="breadcrumb-item active">IT Assets</li>
+            <li t-if="page_name in ('it_asset_detail', 'it_asset_form', 'it_asset_history', 'it_asset_categories', 'it_asset_po')"
+                class="breadcrumb-item"><a href="/my/it-assets">IT Assets</a></li>
+            <li t-if="page_name == 'it_asset_detail'" class="breadcrumb-item active" t-out="asset.code"/>
+            <li t-if="page_name == 'it_asset_form'" class="breadcrumb-item active">
+                <t t-if="asset" t-out="asset.code"/><t t-else="">New Asset</t>
+            </li>
+            <li t-if="page_name == 'it_asset_history'" class="breadcrumb-item active">Assignment History</li>
+            <li t-if="page_name == 'it_asset_categories'" class="breadcrumb-item active">Categories</li>
+            <li t-if="page_name == 'it_asset_po'" class="breadcrumb-item active">Create from Purchase Order</li>
+        </xpath>
+    </template>
+
+    <!-- ================================================================
+         Shared snippets
+         ================================================================ -->
+    <template id="portal_it_asset_alerts" name="IT Asset alerts">
+        <div t-if="message" class="alert alert-success alert-dismissible" role="status">
+            <t t-out="message"/>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"/>
+        </div>
+        <div t-if="error" class="alert alert-danger alert-dismissible" role="alert">
+            <t t-out="error"/>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"/>
+        </div>
+    </template>
+
+    <template id="portal_it_asset_nav" name="IT Asset portal navigation">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <a href="/my/it-assets" class="btn btn-light border"><i class="fa fa-laptop me-1"/>Assets</a>
+            <a href="/my/it-assets/history" class="btn btn-light border"><i class="fa fa-history me-1"/>Assignment History</a>
+            <t t-if="it_is_manager">
+                <a href="/my/it-assets/new" class="btn btn-primary"><i class="fa fa-plus me-1"/>New Asset</a>
+                <a href="/my/it-assets/from-po" class="btn btn-secondary"><i class="fa fa-shopping-cart me-1"/>Create from PO</a>
+                <a href="/my/it-assets/categories" class="btn btn-light border"><i class="fa fa-tags me-1"/>Categories</a>
+            </t>
+        </div>
+    </template>
+
+    <template id="portal_it_asset_state_badge" name="IT Asset state badge">
+        <t t-set="badge_cls" t-value="{'available': 'text-bg-success', 'assigned': 'text-bg-info', 'repair': 'text-bg-warning', 'lost': 'text-bg-danger', 'retired': 'text-bg-secondary'}.get(state, 'text-bg-light')"/>
+        <span t-attf-class="badge rounded-pill #{badge_cls}" t-out="asset_states.get(state)"/>
+    </template>
+
+    <!-- ================================================================
+         List
+         ================================================================ -->
+    <template id="portal_my_it_assets" name="My IT Assets">
+        <t t-call="portal.portal_layout" breadcrumbs_searchbar="True">
+            <t t-call="portal.portal_searchbar" breadcrumbs_searchbar="True" title.translate="IT Assets"/>
+            <t t-call="mj_it_asset.portal_it_asset_alerts"/>
+            <t t-call="mj_it_asset.portal_it_asset_nav"/>
+            <div t-if="not assets" class="alert alert-info">No IT assets found.</div>
+            <t t-else="" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Code</th>
+                        <th>Asset</th>
+                        <th>Serial Number</th>
+                        <th class="d-none d-md-table-cell">Category</th>
+                        <th>Assigned To</th>
+                        <th class="d-none d-lg-table-cell">Purchase Order</th>
+                        <th class="text-end">Status</th>
+                    </tr>
+                </thead>
+                <tbody t-foreach="grouped_assets" t-as="grp">
+                    <tr t-if="grp[0] is not None" class="table-light">
+                        <th colspan="7">
+                            <i class="fa fa-folder-open-o me-1"/><t t-out="grp[0]"/>
+                            <span class="badge rounded-pill text-bg-secondary ms-1" t-out="grp[1]"/>
+                        </th>
+                    </tr>
+                    <tr t-foreach="grp[2]" t-as="a">
+                        <td><a t-attf-href="/my/it-assets/#{a.id}" t-out="a.code"/></td>
+                        <td><a t-attf-href="/my/it-assets/#{a.id}" t-out="a.name"/></td>
+                        <td><code t-out="a.serial_no"/></td>
+                        <td class="d-none d-md-table-cell" t-out="a.category_id.name"/>
+                        <td>
+                            <t t-out="a.employee_id.name"/>
+                            <small t-if="a.department_id" class="text-muted d-block" t-out="a.department_id.name"/>
+                        </td>
+                        <td class="d-none d-lg-table-cell" t-out="a.purchase_order_id.name"/>
+                        <td class="text-end">
+                            <t t-call="mj_it_asset.portal_it_asset_state_badge" state="a.state"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Detail
+         ================================================================ -->
+    <template id="portal_my_it_asset" name="IT Asset">
+        <t t-call="portal.portal_layout">
+            <t t-call="mj_it_asset.portal_it_asset_alerts"/>
+            <t t-call="mj_it_asset.portal_it_asset_nav"/>
+
+            <div class="card mb-3">
+                <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div>
+                        <h4 class="mb-0"><t t-out="asset.name"/></h4>
+                        <small class="text-muted"><t t-out="asset.code"/> · SN: <code t-out="asset.serial_no"/></small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <t t-call="mj_it_asset.portal_it_asset_state_badge" state="asset.state"/>
+                        <a t-if="it_is_manager" t-attf-href="/my/it-assets/#{asset.id}/edit"
+                           class="btn btn-sm btn-secondary"><i class="fa fa-pencil me-1"/>Edit</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div t-if="asset.image" class="col-md-2 mb-3">
+                            <img t-att-src="image_data_uri(asset.image)" class="img-fluid rounded border" alt="Asset"/>
+                        </div>
+                        <div class="col">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-uppercase text-muted small">Identification</h6>
+                                    <table class="table table-sm table-borderless mb-3">
+                                        <tr><th class="w-50">Category</th><td t-out="asset.category_id.name"/></tr>
+                                        <tr><th>Brand</th><td t-out="asset.brand"/></tr>
+                                        <tr><th>Model</th><td t-out="asset.model_no"/></tr>
+                                        <tr><th>Location</th><td t-out="asset.location"/></tr>
+                                    </table>
+                                    <h6 class="text-uppercase text-muted small">Current Holder</h6>
+                                    <table class="table table-sm table-borderless mb-3">
+                                        <tr><th class="w-50">Employee</th><td t-out="asset.employee_id.name or '-'"/></tr>
+                                        <tr><th>Department</th><td t-out="asset.department_id.name"/></tr>
+                                        <tr><th>Since</th><td t-out="asset.assigned_date" t-options="{'widget': 'date'}"/></tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-uppercase text-muted small">Purchase &amp; Warranty</h6>
+                                    <table class="table table-sm table-borderless mb-3">
+                                        <tr><th class="w-50">Purchase Order</th><td t-out="asset.purchase_order_id.name"/></tr>
+                                        <tr><th>PO Line</th><td t-out="(asset.purchase_line_id.name or '').split('\n')[0]"/></tr>
+                                        <tr><th>Vendor</th><td t-out="asset.vendor_id.name"/></tr>
+                                        <tr><th>Purchase Date</th><td t-out="asset.purchase_date" t-options="{'widget': 'date'}"/></tr>
+                                        <tr t-if="it_is_manager"><th>Value</th>
+                                            <td t-out="asset.purchase_value" t-options="{'widget': 'monetary', 'display_currency': asset.currency_id}"/></tr>
+                                        <tr><th>Warranty Expiry</th>
+                                            <td t-att-class="'text-danger' if asset.warranty_expired else ''">
+                                                <t t-out="asset.warranty_expiry" t-options="{'widget': 'date'}"/>
+                                                <small t-if="asset.warranty_expired"> (expired)</small>
+                                            </td></tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div t-if="asset.specification">
+                                <h6 class="text-uppercase text-muted small">Specification</h6>
+                                <p style="white-space: pre-line;" t-out="asset.specification"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manager actions -->
+            <div t-if="it_is_manager" class="row g-3 mb-3">
+                <div class="col-lg-6" t-if="asset.state in ('available', 'assigned')">
+                    <div class="card h-100">
+                        <div class="card-header fw-bold">
+                            <t t-if="asset.state == 'assigned'">Re-assign to Another Employee</t>
+                            <t t-else="">Assign to Employee</t>
+                        </div>
+                        <div class="card-body">
+                            <form t-attf-action="/my/it-assets/#{asset.id}/assign" method="post">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <div class="mb-2">
+                                    <label class="form-label" for="employee_id">Employee</label>
+                                    <select name="employee_id" id="employee_id" class="form-select" required="required">
+                                        <option value="">Select an employee...</option>
+                                        <t t-foreach="employees" t-as="emp">
+                                            <option t-if="emp != asset.employee_id" t-att-value="emp.id">
+                                                <t t-out="emp.name"/><t t-if="emp.department_id"> (<t t-out="emp.department_id.name"/>)</t>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6 mb-2">
+                                        <label class="form-label" for="assign_date">Date</label>
+                                        <input type="date" name="date" id="assign_date" class="form-control" t-att-value="today"/>
+                                    </div>
+                                    <div class="col-6 mb-2">
+                                        <label class="form-label" for="assign_condition">Condition</label>
+                                        <select name="condition" id="assign_condition" class="form-select">
+                                            <t t-foreach="conditions" t-as="c">
+                                                <option t-att-value="c[0]" t-att-selected="c[0] == 'good'" t-out="c[1]"/>
+                                            </t>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-2" t-if="asset.state == 'assigned'">
+                                    <label class="form-label" for="previous_reason">
+                                        Reason for leaving <t t-out="asset.employee_id.name"/>
+                                    </label>
+                                    <select name="previous_reason" id="previous_reason" class="form-select">
+                                        <t t-foreach="return_reasons" t-as="r">
+                                            <option t-att-value="r[0]" t-att-selected="r[0] == 'transfer'" t-out="r[1]"/>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label" for="assign_note">Note</label>
+                                    <textarea name="note" id="assign_note" class="form-control" rows="2"
+                                              placeholder="Accessories given, etc."/>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <t t-if="asset.state == 'assigned'">Re-assign</t><t t-else="">Assign</t>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6" t-if="asset.state == 'assigned'">
+                    <div class="card h-100">
+                        <div class="card-header fw-bold">Return from <t t-out="asset.employee_id.name"/></div>
+                        <div class="card-body">
+                            <form t-attf-action="/my/it-assets/#{asset.id}/return" method="post">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <div class="row">
+                                    <div class="col-6 mb-2">
+                                        <label class="form-label" for="return_date">Return Date</label>
+                                        <input type="date" name="date" id="return_date" class="form-control" t-att-value="today"/>
+                                    </div>
+                                    <div class="col-6 mb-2">
+                                        <label class="form-label" for="return_reason">Reason</label>
+                                        <select name="reason" id="return_reason" class="form-select">
+                                            <t t-foreach="return_reasons" t-as="r">
+                                                <option t-if="r[0] != 'transfer'" t-att-value="r[0]"
+                                                        t-att-selected="r[0] == 'resign'" t-out="r[1]"/>
+                                            </t>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 mb-2">
+                                        <label class="form-label" for="return_condition">Condition</label>
+                                        <select name="condition" id="return_condition" class="form-select">
+                                            <t t-foreach="conditions" t-as="c">
+                                                <option t-att-value="c[0]" t-att-selected="c[0] == 'good'" t-out="c[1]"/>
+                                            </t>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 mb-2">
+                                        <label class="form-label" for="next_state">Status After Return</label>
+                                        <select name="next_state" id="next_state" class="form-select">
+                                            <option value="available" selected="selected">Available (IT stock)</option>
+                                            <option value="repair">In Repair</option>
+                                            <option value="lost">Lost / Stolen</option>
+                                            <option value="retired">Retired / Disposed</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label" for="return_note">Note</label>
+                                    <textarea name="note" id="return_note" class="form-control" rows="2"
+                                              placeholder="Missing accessories, damages, etc."/>
+                                </div>
+                                <button type="submit" class="btn btn-warning">Confirm Return</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="d-flex flex-wrap gap-2">
+                        <t t-foreach="[('repair', 'Send to Repair', asset.state in ('available', 'assigned')), ('available', 'Set Available', asset.state in ('repair', 'lost', 'retired')), ('lost', 'Mark Lost', asset.state not in ('lost', 'retired')), ('retire', 'Retire / Dispose', asset.state != 'retired')]" t-as="act">
+                            <form t-if="act[2]" t-attf-action="/my/it-assets/#{asset.id}/status" method="post" class="d-inline">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="action" t-att-value="act[0]"/>
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" t-out="act[1]"/>
+                            </form>
+                        </t>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History -->
+            <h5 class="mt-4">Assignment History</h5>
+            <div t-if="not asset.assignment_ids" class="text-muted">This asset has never been assigned.</div>
+            <t t-else="" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Employee</th>
+                        <th class="d-none d-md-table-cell">Department</th>
+                        <th>Assigned</th>
+                        <th>Returned</th>
+                        <th class="d-none d-md-table-cell">Days</th>
+                        <th class="d-none d-md-table-cell">Reason</th>
+                        <th class="d-none d-lg-table-cell">Condition</th>
+                        <th class="text-end">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="asset.assignment_ids" t-as="h">
+                        <td t-out="h.employee_id.name"/>
+                        <td class="d-none d-md-table-cell" t-out="h.department_id.name"/>
+                        <td t-out="h.date_assigned" t-options="{'widget': 'date'}"/>
+                        <td t-out="h.date_returned" t-options="{'widget': 'date'}"/>
+                        <td class="d-none d-md-table-cell" t-out="h.duration_days"/>
+                        <td class="d-none d-md-table-cell" t-out="dict(return_reasons).get(h.return_reason, '')"/>
+                        <td class="d-none d-lg-table-cell">
+                            <t t-out="dict(conditions).get(h.condition_out, '')"/>
+                            <t t-if="h.condition_in"> → <t t-out="dict(conditions).get(h.condition_in, '')"/></t>
+                        </td>
+                        <td class="text-end">
+                            <span t-if="h.state == 'active'" class="badge rounded-pill text-bg-success">In Use</span>
+                            <span t-else="" class="badge rounded-pill text-bg-light">Returned</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Create / edit form
+         ================================================================ -->
+    <template id="portal_it_asset_form" name="IT Asset form">
+        <t t-call="portal.portal_layout">
+            <t t-call="mj_it_asset.portal_it_asset_alerts"/>
+            <t t-call="mj_it_asset.portal_it_asset_nav"/>
+            <t t-set="f" t-value="form or {}"/>
+            <t t-set="v_po" t-value="str(f.get('purchase_order_id') or (asset and asset.purchase_order_id.id) or '')"/>
+            <t t-set="v_line" t-value="str(f.get('purchase_line_id') or (asset and asset.purchase_line_id.id) or '')"/>
+            <t t-set="v_cat" t-value="str(f.get('category_id') or (asset and asset.category_id.id) or '')"/>
+            <t t-set="v_vendor" t-value="str(f.get('vendor_id') or (asset and asset.vendor_id.id) or '')"/>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><t t-if="asset">Edit <t t-out="asset.code"/></t><t t-else="">New IT Asset</t></h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" t-att-action="('/my/it-assets/%s/edit' % asset.id) if asset else '/my/it-assets/new'">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-uppercase text-muted small mt-2">Identification</h6>
+                                <div class="mb-2">
+                                    <label class="form-label" for="name">Asset Name *</label>
+                                    <input type="text" name="name" id="name" class="form-control" required="required"
+                                           placeholder="e.g. Dell Latitude 5440"
+                                           t-att-value="f.get('name', asset.name if asset else '')"/>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label" for="serial_no">Serial Number *</label>
+                                    <input type="text" name="serial_no" id="serial_no" class="form-control" required="required"
+                                           t-att-value="f.get('serial_no', asset.serial_no if asset else '')"/>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label" for="category_id">Category *</label>
+                                    <select name="category_id" id="category_id" class="form-select" required="required">
+                                        <option value="">Select...</option>
+                                        <t t-foreach="categories" t-as="c">
+                                            <option t-att-value="c.id" t-att-selected="str(c.id) == v_cat" t-out="c.name"/>
+                                        </t>
+                                    </select>
+                                    <small class="text-muted">Missing one? <a href="/my/it-assets/categories">Add a category</a>.</small>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6 mb-2">
+                                        <label class="form-label" for="brand">Brand</label>
+                                        <input type="text" name="brand" id="brand" class="form-control"
+                                               t-att-value="f.get('brand', (asset.brand or '') if asset else '')"/>
+                                    </div>
+                                    <div class="col-6 mb-2">
+                                        <label class="form-label" for="model_no">Model</label>
+                                        <input type="text" name="model_no" id="model_no" class="form-control"
+                                               t-att-value="f.get('model_no', (asset.model_no or '') if asset else '')"/>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label" for="location">Location</label>
+                                    <input type="text" name="location" id="location" class="form-control"
+                                           t-att-value="f.get('location', (asset.location or '') if asset else '')"/>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label" for="specification">Specification</label>
+                                    <textarea name="specification" id="specification" class="form-control" rows="4"
+                                              placeholder="CPU, RAM, storage, MAC address, IMEI ..."
+                                              t-out="f.get('specification', (asset.specification or '') if asset else '')"/>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-uppercase text-muted small mt-2">Purchase &amp; Warranty</h6>
+                                <div class="mb-2">
+                                    <label class="form-label" for="purchase_order_id">Purchase Order</label>
+                                    <select name="purchase_order_id" id="purchase_order_id" class="form-select">
+                                        <option value="">None</option>
+                                        <t t-foreach="purchase_orders" t-as="po">
+                                            <option t-att-value="po.id" t-att-selected="str(po.id) == v_po">
+                                                <t t-out="po.name"/> - <t t-out="po.partner_id.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label" for="purchase_line_id">PO Line</label>
+                                    <select name="purchase_line_id" id="purchase_line_id" class="form-select">
+                                        <option value="" data-order="">None</option>
+                                        <t t-foreach="purchase_lines" t-as="pl">
+                                            <option t-att-value="pl.id" t-att-data-order="pl.order_id.id"
+                                                    t-att-selected="str(pl.id) == v_line">
+                                                <t t-out="(pl.name or '').split('\n')[0]"/> (<t t-out="pl.product_qty"/> × <t t-out="pl.price_unit"/>)
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label" for="vendor_id">Vendor</label>
+                                    <select name="vendor_id" id="vendor_id" class="form-select">
+                                        <option value="">Same as Purchase Order / none</option>
+                                        <t t-foreach="vendors" t-as="v">
+                                            <option t-att-value="v.id" t-att-selected="str(v.id) == v_vendor" t-out="v.name"/>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6 mb-2">
+                                        <label class="form-label" for="purchase_date">Purchase Date</label>
+                                        <input type="date" name="purchase_date" id="purchase_date" class="form-control"
+                                               t-att-value="f.get('purchase_date', (asset and asset.purchase_date and str(asset.purchase_date)) or '')"/>
+                                    </div>
+                                    <div class="col-6 mb-2">
+                                        <label class="form-label" for="purchase_value">Value</label>
+                                        <input type="number" step="0.01" min="0" name="purchase_value" id="purchase_value" class="form-control"
+                                               t-att-value="f.get('purchase_value', (asset.purchase_value if asset else ''))"/>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label" for="warranty_expiry">Warranty Expiry</label>
+                                    <input type="date" name="warranty_expiry" id="warranty_expiry" class="form-control"
+                                           t-att-value="f.get('warranty_expiry', (asset and asset.warranty_expiry and str(asset.warranty_expiry)) or '')"/>
+                                </div>
+                                <p class="text-muted small">If a Purchase Order is selected, empty vendor, date and
+                                    value are filled from the PO / PO line automatically.</p>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 mt-2">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <a t-att-href="('/my/it-assets/%s' % asset.id) if asset else '/my/it-assets'" class="btn btn-light border">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script>
+                (function () {
+                    var po = document.getElementById('purchase_order_id');
+                    var line = document.getElementById('purchase_line_id');
+                    if (!po || !line) { return; }
+                    function filterLines() {
+                        var current = po.value;
+                        Array.prototype.forEach.call(line.options, function (opt) {
+                            var show = !opt.value || opt.getAttribute('data-order') === current;
+                            opt.hidden = !show;
+                            opt.disabled = !show;
+                        });
+                        var sel = line.options[line.selectedIndex];
+                        if (sel &amp;&amp; sel.disabled) { line.value = ''; }
+                    }
+                    po.addEventListener('change', filterLines);
+                    filterLines();
+                })();
+            </script>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Assignment history
+         ================================================================ -->
+    <template id="portal_it_asset_history" name="IT Asset assignment history">
+        <t t-call="portal.portal_layout" breadcrumbs_searchbar="True">
+            <t t-call="portal.portal_searchbar" breadcrumbs_searchbar="True" title.translate="Assignment History"/>
+            <t t-call="mj_it_asset.portal_it_asset_alerts"/>
+            <t t-call="mj_it_asset.portal_it_asset_nav"/>
+            <div t-if="not lines" class="alert alert-info">No assignment history found.</div>
+            <t t-else="" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Asset</th>
+                        <th>Serial Number</th>
+                        <th>Employee</th>
+                        <th class="d-none d-md-table-cell">Department</th>
+                        <th>Assigned</th>
+                        <th>Returned</th>
+                        <th class="d-none d-md-table-cell">Reason</th>
+                        <th class="text-end">Status</th>
+                    </tr>
+                </thead>
+                <tbody t-foreach="grouped_lines" t-as="grp">
+                    <tr t-if="grp[0] is not None" class="table-light">
+                        <th colspan="8">
+                            <i class="fa fa-folder-open-o me-1"/><t t-out="grp[0]"/>
+                            <span class="badge rounded-pill text-bg-secondary ms-1" t-out="grp[1]"/>
+                        </th>
+                    </tr>
+                    <tr t-foreach="grp[2]" t-as="h">
+                        <td>
+                            <a t-if="it_is_manager or h.state == 'active'" t-attf-href="/my/it-assets/#{h.asset_id.id}">
+                                <t t-out="h.asset_code"/> <t t-out="h.asset_id.name"/>
+                            </a>
+                            <t t-else=""><t t-out="h.asset_code"/> <t t-out="h.asset_id.name"/></t>
+                        </td>
+                        <td><code t-out="h.serial_no"/></td>
+                        <td t-out="h.employee_id.name"/>
+                        <td class="d-none d-md-table-cell" t-out="h.department_id.name"/>
+                        <td t-out="h.date_assigned" t-options="{'widget': 'date'}"/>
+                        <td t-out="h.date_returned" t-options="{'widget': 'date'}"/>
+                        <td class="d-none d-md-table-cell" t-out="dict(return_reasons).get(h.return_reason, '')"/>
+                        <td class="text-end">
+                            <span t-if="h.state == 'active'" class="badge rounded-pill text-bg-success">In Use</span>
+                            <span t-else="" class="badge rounded-pill text-bg-light">Returned</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Categories
+         ================================================================ -->
+    <template id="portal_it_asset_categories" name="IT Asset categories">
+        <t t-call="portal.portal_layout">
+            <t t-call="mj_it_asset.portal_it_asset_alerts"/>
+            <t t-call="mj_it_asset.portal_it_asset_nav"/>
+            <div class="row g-3">
+                <div class="col-lg-7">
+                    <t t-call="portal.portal_table">
+                        <thead>
+                            <tr class="active"><th>Category</th><th>Code</th><th class="text-end">Assets</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="categories" t-as="c">
+                                <td t-out="c.name"/>
+                                <td t-out="c.code"/>
+                                <td class="text-end" t-out="c.asset_count"/>
+                            </tr>
+                        </tbody>
+                    </t>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card">
+                        <div class="card-header fw-bold">Add Category</div>
+                        <div class="card-body">
+                            <form method="post" action="/my/it-assets/categories">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <div class="mb-2">
+                                    <label class="form-label" for="cat_name">Name *</label>
+                                    <input type="text" name="name" id="cat_name" class="form-control" required="required"
+                                           placeholder="e.g. Laptop"/>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label" for="cat_code">Code</label>
+                                    <input type="text" name="code" id="cat_code" class="form-control" placeholder="e.g. LPT"/>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Add</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ================================================================
+         Create from Purchase Order
+         ================================================================ -->
+    <template id="portal_it_asset_from_po" name="IT Assets from Purchase Order">
+        <t t-call="portal.portal_layout">
+            <t t-call="mj_it_asset.portal_it_asset_alerts"/>
+            <t t-call="mj_it_asset.portal_it_asset_nav"/>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <form method="get" action="/my/it-assets/from-po" class="row g-2 align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label" for="po_id">Confirmed Purchase Order</label>
+                            <select name="po_id" id="po_id" class="form-select" required="required">
+                                <option value="">Select a purchase order...</option>
+                                <t t-foreach="purchase_orders" t-as="p">
+                                    <option t-att-value="p.id" t-att-selected="po and p.id == po.id">
+                                        <t t-out="p.name"/> - <t t-out="p.partner_id.name"/>
+                                        (<t t-out="p.date_order" t-options="{'widget': 'date'}"/>)
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-secondary w-100">Load Lines</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <t t-if="po">
+                <div t-if="not rows" class="alert alert-info">
+                    All units of <t t-out="po.name"/> are already registered as IT assets
+                    (or the PO has no goods lines).
+                </div>
+                <form t-else="" method="post" t-attf-action="/my/it-assets/from-po?po_id=#{po.id}">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <p class="text-muted">One row per ordered unit not yet registered. Untick rows
+                        that are not IT assets and enter the serial number of each unit.</p>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="default_category_id">Default Category (for rows without one)</label>
+                            <select name="default_category_id" id="default_category_id" class="form-select">
+                                <option value="">None</option>
+                                <t t-foreach="categories" t-as="c">
+                                    <option t-att-value="c.id" t-att-selected="str(c.id) == str(post.get('default_category_id'))" t-out="c.name"/>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="default_warranty">Default Warranty Expiry</label>
+                            <input type="date" name="default_warranty" id="default_warranty" class="form-control"
+                                   t-att-value="post.get('default_warranty', '')"/>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>PO Line</th>
+                                    <th>Asset Name</th>
+                                    <th>Serial Number *</th>
+                                    <th>Category</th>
+                                    <th>Brand</th>
+                                    <th>Model</th>
+                                    <th>Warranty</th>
+                                    <th>Unit Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="rows" t-as="row">
+                                    <t t-set="i" t-value="row_index"/>
+                                    <td>
+                                        <input type="hidden" t-att-name="'line_%s' % i" t-att-value="row['purchase_line_id']"/>
+                                        <input type="checkbox" class="form-check-input" t-att-name="'include_%s' % i" value="1"
+                                               t-att-checked="(not post) or post.get('include_%s' % i)"/>
+                                    </td>
+                                    <td class="small" t-out="row['po_line_label']"/>
+                                    <td><input type="text" class="form-control form-control-sm" t-att-name="'name_%s' % i"
+                                               t-att-value="post.get('name_%s' % i, row['name'])"/></td>
+                                    <td><input type="text" class="form-control form-control-sm" t-att-name="'serial_%s' % i"
+                                               t-att-value="post.get('serial_%s' % i, '')"/></td>
+                                    <td>
+                                        <select class="form-select form-select-sm" t-att-name="'category_%s' % i">
+                                            <option value="">Default</option>
+                                            <t t-foreach="categories" t-as="c">
+                                                <option t-att-value="c.id" t-att-selected="str(c.id) == str(post.get('category_%s' % i))" t-out="c.name"/>
+                                            </t>
+                                        </select>
+                                    </td>
+                                    <td><input type="text" class="form-control form-control-sm" t-att-name="'brand_%s' % i"
+                                               t-att-value="post.get('brand_%s' % i, '')"/></td>
+                                    <td><input type="text" class="form-control form-control-sm" t-att-name="'model_%s' % i"
+                                               t-att-value="post.get('model_%s' % i, '')"/></td>
+                                    <td><input type="date" class="form-control form-control-sm" t-att-name="'warranty_%s' % i"
+                                               t-att-value="post.get('warranty_%s' % i, '')"/></td>
+                                    <td><input type="number" step="0.01" class="form-control form-control-sm" t-att-name="'value_%s' % i"
+                                               t-att-value="post.get('value_%s' % i, row['purchase_value'])"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Assets</button>
+                </form>
+            </t>
+        </t>
+    </template>
+</odoo>

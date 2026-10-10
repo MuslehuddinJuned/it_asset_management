@@ -1,0 +1,257 @@
+<section class="oe_container" style="font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #333;">
+
+    <!-- ===================== HERO ===================== -->
+    <div class="mb-4 p-4 text-center"
+         style="text-align: center; padding: 28px 20px; margin-bottom: 24px; background: linear-gradient(135deg, #714B78 0%, #50286E 100%); border-radius: 10px; color: #fff;">
+        <h1 style="color: #fff; font-weight: 700; margin-bottom: 6px;">IT Asset Management</h1>
+        <p style="font-size: 18px; color: #EFE8F3; margin-bottom: 14px;">
+            Register IT equipment by serial number, hand it over to employees with a complete,
+            auditable history, link every asset to its Purchase Order and let employees
+            and IT vendors work from the portal.
+        </p>
+        <div>
+            <span style="display: inline-block; background: #fff; color: #50286E; border-radius: 20px; padding: 3px 14px; margin: 3px; font-size: 13px; font-weight: 600;">Odoo 20.0</span>
+            <span style="display: inline-block; background: #fff; color: #50286E; border-radius: 20px; padding: 3px 14px; margin: 3px; font-size: 13px; font-weight: 600;">Community &amp; Enterprise</span>
+            <span style="display: inline-block; background: #fff; color: #50286E; border-radius: 20px; padding: 3px 14px; margin: 3px; font-size: 13px; font-weight: 600;">Backend + Portal</span>
+            <span style="display: inline-block; background: #fff; color: #50286E; border-radius: 20px; padding: 3px 14px; margin: 3px; font-size: 13px; font-weight: 600;">LGPL-3</span>
+        </div>
+    </div>
+
+    <div class="mb-4 bg-white p-3"
+         style="background: #fff; padding: 16px 20px; margin-bottom: 24px; border: 1px solid #EBEEF2; border-radius: 6px; box-shadow: 0px 8px 20px -4px rgba(0, 0, 0, 0.10);">
+        <h2 style="color: #2C3E50;">Why this module?</h2>
+        <p>
+            Odoo's <i>Assets</i> app is an accounting tool (depreciation) and does not answer the questions an
+            IT team asks every day: <b>who has this laptop, since when, who had it before, which PO did it come
+            from, and what happens when an employee leaves?</b>
+            This module is a standalone IT asset register, <b>not linked to Products or Accounting Assets</b>,
+            so it works the same on Community and Enterprise without any accounting set-up.
+        </p>
+    </div>
+
+    <!-- ===================== FEATURES ===================== -->
+    <div class="mb-4 bg-white p-3"
+         style="background: #fff; padding: 16px 20px; margin-bottom: 24px; border: 1px solid #EBEEF2; border-radius: 6px; box-shadow: 0px 8px 20px -4px rgba(0, 0, 0, 0.10);">
+        <h2 style="color: #2C3E50;">Key Features</h2>
+        <div class="row" style="display: flex; flex-wrap: wrap;">
+            <div class="col-md-6" style="flex: 1 1 380px; min-width: 0;">
+                <ul>
+                    <li><b>Standalone IT asset register</b> &ndash; automatic asset code (ITA/00001), category, brand, model, location, specification and photo.</li>
+                    <li><b>Serial number tracking</b> &ndash; mandatory and unique per company; search by serial everywhere.</li>
+                    <li><b>Assign / Re-assign / Return</b> with condition (New, Good, Fair, Damaged), notes and dates.</li>
+                    <li><b>Complete assignment history</b> &ndash; the previous holder is closed with a reason (Employee left, Transfer, Upgrade, Repair, Lost &hellip;); nothing is ever overwritten.</li>
+                    <li><b>Employee leaving?</b> &ndash; re-assign or return <i>all</i> their assets in one click from the employee form.</li>
+                    <li><b>Editable, tracked history</b> &ndash; corrections are allowed and every change is logged in the chatter.</li>
+                    <li><b>Lifecycle states</b> &ndash; Available, Assigned, In Repair, Lost / Stolen, Retired / Disposed.</li>
+                </ul>
+            </div>
+            <div class="col-md-6" style="flex: 1 1 380px; min-width: 0;">
+                <ul>
+                    <li><b>Purchase Order link</b> &ndash; link assets to a PO and PO line; vendor, date and cost are filled automatically.</li>
+                    <li><b>Create assets from a confirmed PO</b> &ndash; one line per ordered unit, just type the serial numbers.</li>
+                    <li><b>Smart buttons</b> on Employee and Purchase Order.</li>
+                    <li><b>Customer portal</b> (<code>/my/it-assets</code>) with search, filters, sorting and <b>Group By</b>.</li>
+                    <li><b>Employees</b> see the equipment assigned to them; <b>IT vendors / partners</b> (portal users) can fully manage assets.</li>
+                    <li><b>Data integrity</b> &ndash; one holder at a time, no overlapping periods, no duplicate serials.</li>
+                    <li><b>Security</b> &ndash; read-only users, managers, and deletion reserved to Settings administrators; multi-company ready.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== BACKEND ===================== -->
+    <div class="mb-4 bg-white p-3"
+         style="background: #fff; padding: 16px 20px; margin-bottom: 24px; border: 1px solid #EBEEF2; border-radius: 6px; box-shadow: 0px 8px 20px -4px rgba(0, 0, 0, 0.10);">
+        <h2 style="color: #2C3E50;">1. IT Asset Register</h2>
+        <p>All assets with their serial number, current holder, department, Purchase Order and status.
+           Filter by status, warranty expiry, assets still held by employees who have left, and group by
+           category, employee, department, PO or vendor.</p>
+        <div class="col-md-12 text-center my-3" style="text-align: center; margin: 16px 0;">
+            <div class="d-inline-block shadow-sm" style="display: inline-block; max-width: 100%; background-color: #fff; border-radius: 10px; border: 1px solid #E5E7EB; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <img alt="IT asset list" class="img-fluid" loading="lazy" style="max-width: 100%; height: auto; border-radius: 10px; display: block;" src="./assets/screenshots/01_list.png">
+            </div>
+        </div>
+        <p>Kanban view grouped by status:</p>
+        <div class="col-md-12 text-center my-3" style="text-align: center; margin: 16px 0;">
+            <div class="d-inline-block shadow-sm" style="display: inline-block; max-width: 100%; background-color: #fff; border-radius: 10px; border: 1px solid #E5E7EB; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <img alt="IT asset kanban" class="img-fluid" loading="lazy" style="max-width: 100%; height: auto; border-radius: 10px; display: block;" src="./assets/screenshots/02_kanban.png">
+            </div>
+        </div>
+
+        <h3 style="color: #2C3E50;">2. Asset Form &amp; Assignment History</h3>
+        <p>Identification, current holder, purchase &amp; warranty information, specification and the full
+           hand-over history of the asset. Every action is posted in the chatter.</p>
+        <div class="col-md-12 text-center my-3" style="text-align: center; margin: 16px 0;">
+            <div class="d-inline-block shadow-sm" style="display: inline-block; max-width: 100%; background-color: #fff; border-radius: 10px; border: 1px solid #E5E7EB; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <img alt="Asset form with history" class="img-fluid" loading="lazy" style="max-width: 100%; height: auto; border-radius: 10px; display: block;" src="./assets/screenshots/03_form_history.png">
+            </div>
+        </div>
+
+        <h3 style="color: #2C3E50;">3. Assign &amp; Re-assign</h3>
+        <p>Hand an asset (or several at once) to an employee. If it is already held by someone, their
+           assignment is closed automatically with the reason you choose &ndash; e.g. <i>Employee Left / Resigned</i>.</p>
+        <div class="col-md-12 text-center my-3" style="text-align: center; margin: 16px 0;">
+            <div class="d-inline-block shadow-sm" style="display: inline-block; max-width: 100%; background-color: #fff; border-radius: 10px; border: 1px solid #E5E7EB; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <img alt="Re-assign wizard" class="img-fluid" loading="lazy" style="max-width: 100%; height: auto; border-radius: 10px; display: block;" src="./assets/screenshots/04_reassign_wizard.png">
+            </div>
+        </div>
+
+        <h3 style="color: #2C3E50;">4. Return</h3>
+        <p>Record the return date, reason and condition, and decide the next status (back to IT stock,
+           In Repair, Lost, Retired). A damaged return suggests <i>In Repair</i> automatically.</p>
+        <div class="col-md-12 text-center my-3" style="text-align: center; margin: 16px 0;">
+            <div class="d-inline-block shadow-sm" style="display: inline-block; max-width: 100%; background-color: #fff; border-radius: 10px; border: 1px solid #E5E7EB; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <img alt="Return wizard" class="img-fluid" loading="lazy" style="max-width: 100%; height: auto; border-radius: 10px; display: block;" src="./assets/screenshots/05_return_wizard.png">
+            </div>
+        </div>
+
+        <h3 style="color: #2C3E50;">5. Create IT Assets from a Purchase Order</h3>
+        <p>A <b>Create IT Assets</b> button on confirmed Purchase Orders proposes one line per ordered unit
+           that is not registered yet. Enter the serial numbers and the assets are created already linked
+           to the PO, the PO line and the vendor, with the unit cost.</p>
+        <div class="col-md-12 text-center my-3" style="text-align: center; margin: 16px 0;">
+            <div class="d-inline-block shadow-sm" style="display: inline-block; max-width: 100%; background-color: #fff; border-radius: 10px; border: 1px solid #E5E7EB; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <img alt="Create IT assets from PO" class="img-fluid" loading="lazy" style="max-width: 100%; height: auto; border-radius: 10px; display: block;" src="./assets/screenshots/07_po_wizard.png">
+            </div>
+        </div>
+
+        <h3 style="color: #2C3E50;">6. Employee Form</h3>
+        <p>An <b>IT Assets</b> smart button and tab show what the employee currently holds and everything
+           they held before. When someone leaves: <b>Re-assign All to Another Employee</b> or <b>Return All to IT</b>.</p>
+        <div class="col-md-12 text-center my-3" style="text-align: center; margin: 16px 0;">
+            <div class="d-inline-block shadow-sm" style="display: inline-block; max-width: 100%; background-color: #fff; border-radius: 10px; border: 1px solid #E5E7EB; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <img alt="Employee IT assets tab" class="img-fluid" loading="lazy" style="max-width: 100%; height: auto; border-radius: 10px; display: block;" src="./assets/screenshots/08_employee_tab.png">
+            </div>
+        </div>
+
+        <h3 style="color: #2C3E50;">7. Assignment History</h3>
+        <p>Every hand-over of every asset in one list: employee and department at the time of assignment,
+           dates, days used, conditions and return reason.</p>
+        <div class="col-md-12 text-center my-3" style="text-align: center; margin: 16px 0;">
+            <div class="d-inline-block shadow-sm" style="display: inline-block; max-width: 100%; background-color: #fff; border-radius: 10px; border: 1px solid #E5E7EB; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <img alt="Assignment history" class="img-fluid" loading="lazy" style="max-width: 100%; height: auto; border-radius: 10px; display: block;" src="./assets/screenshots/09_history_list.png">
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== PORTAL ===================== -->
+    <div class="mb-4 bg-white p-3"
+         style="background: #fff; padding: 16px 20px; margin-bottom: 24px; border: 1px solid #EBEEF2; border-radius: 6px; box-shadow: 0px 8px 20px -4px rgba(0, 0, 0, 0.10);">
+        <h2 style="color: #2C3E50;">Customer Portal</h2>
+        <p>
+            <b>Employees</b> linked to a portal user (Related User or Work Contact) see the assets assigned to
+            them. Portal users flagged as <b>IT Asset Portal Manager</b> &ndash; e.g. your outsourced IT vendor &ndash;
+            can add, edit, assign, re-assign and return assets, manage categories and create assets from
+            Purchase Orders, without access to the Odoo backend.
+        </p>
+
+        <h3 style="color: #2C3E50;">8. Portal Home</h3>
+        <div class="col-md-12 text-center my-3" style="text-align: center; margin: 16px 0;">
+            <div class="d-inline-block shadow-sm" style="display: inline-block; max-width: 100%; background-color: #fff; border-radius: 10px; border: 1px solid #E5E7EB; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <img alt="Portal home" class="img-fluid" loading="lazy" style="max-width: 100%; height: auto; border-radius: 10px; display: block;" src="./assets/screenshots/11_portal_home.png">
+            </div>
+        </div>
+
+        <h3 style="color: #2C3E50;">9. Portal Asset List with Group By</h3>
+        <p>Sort, filter, search and group by Status, Category, Employee, Department, Purchase Order or Vendor.</p>
+        <div class="col-md-12 text-center my-3" style="text-align: center; margin: 16px 0;">
+            <div class="d-inline-block shadow-sm" style="display: inline-block; max-width: 100%; background-color: #fff; border-radius: 10px; border: 1px solid #E5E7EB; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <img alt="Portal asset list" class="img-fluid" loading="lazy" style="max-width: 100%; height: auto; border-radius: 10px; display: block;" src="./assets/screenshots/12_portal_list.png">
+            </div>
+        </div>
+
+        <h3 style="color: #2C3E50;">10. Portal Asset Page</h3>
+        <p>Asset details, re-assign / return forms, status actions and the complete history.</p>
+        <div class="col-md-12 text-center my-3" style="text-align: center; margin: 16px 0;">
+            <div class="d-inline-block shadow-sm" style="display: inline-block; max-width: 100%; background-color: #fff; border-radius: 10px; border: 1px solid #E5E7EB; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <img alt="Portal asset detail" class="img-fluid" loading="lazy" style="max-width: 100%; height: auto; border-radius: 10px; display: block;" src="./assets/screenshots/13_portal_detail.png">
+            </div>
+        </div>
+
+        <h3 style="color: #2C3E50;">11. Create Assets from a PO on the Portal</h3>
+        <div class="col-md-12 text-center my-3" style="text-align: center; margin: 16px 0;">
+            <div class="d-inline-block shadow-sm" style="display: inline-block; max-width: 100%; background-color: #fff; border-radius: 10px; border: 1px solid #E5E7EB; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <img alt="Portal create from PO" class="img-fluid" loading="lazy" style="max-width: 100%; height: auto; border-radius: 10px; display: block;" src="./assets/screenshots/14_portal_from_po.png">
+            </div>
+        </div>
+
+        <h3 style="color: #2C3E50;">12. Enable a Portal Manager</h3>
+        <p>Open the portal user in <i>Settings &rsaquo; Users</i> and tick <b>IT Asset Portal Manager</b> on the
+           <i>Access Rights</i> tab.</p>
+        <div class="col-md-12 text-center my-3" style="text-align: center; margin: 16px 0;">
+            <div class="d-inline-block shadow-sm" style="display: inline-block; max-width: 100%; background-color: #fff; border-radius: 10px; border: 1px solid #E5E7EB; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <img alt="Portal manager toggle" class="img-fluid" loading="lazy" style="max-width: 100%; height: auto; border-radius: 10px; display: block;" src="./assets/screenshots/10_user_toggle.png">
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== ACCESS RIGHTS ===================== -->
+    <div class="mb-4 bg-white p-3"
+         style="background: #fff; padding: 16px 20px; margin-bottom: 24px; border: 1px solid #EBEEF2; border-radius: 6px; box-shadow: 0px 8px 20px -4px rgba(0, 0, 0, 0.10);">
+        <h2 style="color: #2C3E50;">Access Rights</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm" style="margin-bottom: 0; width: 100%; border-collapse: collapse;">
+                <thead style="background: #F3EEF5;">
+                    <tr><th style="border: 1px solid #DEE2E6; padding: 6px 10px; text-align: left; vertical-align: top;">Group</th><th style="border: 1px solid #DEE2E6; padding: 6px 10px; text-align: left; vertical-align: top;">What they can do</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td style="border: 1px solid #DEE2E6; padding: 6px 10px; text-align: left; vertical-align: top;"><b>IT Asset / User</b></td><td style="border: 1px solid #DEE2E6; padding: 6px 10px; text-align: left; vertical-align: top;">View assets and assignment history (read-only), backend and portal.</td></tr>
+                    <tr><td style="border: 1px solid #DEE2E6; padding: 6px 10px; text-align: left; vertical-align: top;"><b>IT Asset / Manager</b></td><td style="border: 1px solid #DEE2E6; padding: 6px 10px; text-align: left; vertical-align: top;">Create and edit assets, assign, re-assign, return, create assets from Purchase Orders, correct history.</td></tr>
+                    <tr><td style="border: 1px solid #DEE2E6; padding: 6px 10px; text-align: left; vertical-align: top;"><b>Settings / Administration</b></td><td style="border: 1px solid #DEE2E6; padding: 6px 10px; text-align: left; vertical-align: top;">Everything above, plus <b>delete</b> (deletion is reserved to administrators).</td></tr>
+                    <tr><td style="border: 1px solid #DEE2E6; padding: 6px 10px; text-align: left; vertical-align: top;"><b>IT Asset Portal Manager</b> (portal users)</td><td style="border: 1px solid #DEE2E6; padding: 6px 10px; text-align: left; vertical-align: top;">Full asset management from the portal, limited to their companies.</td></tr>
+                    <tr><td style="border: 1px solid #DEE2E6; padding: 6px 10px; text-align: left; vertical-align: top;"><b>Employees</b> (portal or internal)</td><td style="border: 1px solid #DEE2E6; padding: 6px 10px; text-align: left; vertical-align: top;">See the assets currently assigned to them and their own history on the portal.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===================== CONFIGURATION ===================== -->
+    <div class="mb-4 bg-white p-3"
+         style="background: #fff; padding: 16px 20px; margin-bottom: 24px; border: 1px solid #EBEEF2; border-radius: 6px; box-shadow: 0px 8px 20px -4px rgba(0, 0, 0, 0.10);">
+        <h2 style="color: #2C3E50;">Getting Started</h2>
+        <ol>
+            <li>Install <b>IT Asset Management</b> (depends on Employees, Purchase and Portal).</li>
+            <li>Give your IT team the <b>IT Asset / Manager</b> access right.</li>
+            <li>Create your categories in <i>IT Assets &rsaquo; Configuration &rsaquo; Categories</i> (Laptop, Monitor, Printer &hellip;).</li>
+            <li>Register assets manually or with <b>Create IT Assets</b> on a confirmed Purchase Order.</li>
+            <li>Use <b>Assign</b>, <b>Re-assign</b> and <b>Return</b> &ndash; the history is kept automatically.</li>
+            <li>Optional: tick <b>IT Asset Portal Manager</b> on portal users who should manage assets from the portal.</li>
+        </ol>
+    </div>
+
+    <!-- ===================== TECHNICAL ===================== -->
+    <div class="mb-4 bg-white p-3"
+         style="background: #fff; padding: 16px 20px; margin-bottom: 24px; border: 1px solid #EBEEF2; border-radius: 6px; box-shadow: 0px 8px 20px -4px rgba(0, 0, 0, 0.10);">
+        <h2 style="color: #2C3E50;">Technical Notes</h2>
+        <ul>
+            <li>Developed and tested on Odoo 20.0 (Community &amp; Enterprise).</li>
+            <li>Odoo 20 unified access model: <code>security/ir.access.csv</code> (permissions and multi-company restrictions).</li>
+            <li>Portal home card defined as a <code>portal.entry</code> record; templates use the Odoo 20 <code>t-call</code> parameters.</li>
+            <li>Field changes are logged in the chatter out of the box; install the optional <i>Discuss Tracking</i> (<code>mail_tracking</code>) app if you also want the structured tracking table.</li>
+            <li>Standalone models: <code>it.asset</code>, <code>it.asset.assignment</code>, <code>it.asset.category</code>; no dependency on Products or Accounting Assets.</li>
+            <li>Depends on <code>hr</code>, <code>purchase</code>, <code>portal</code> and <code>mail</code> &ndash; all available in Odoo Community.</li>
+            <li>Portal pages check access explicitly (manager / employee / company) before reading or writing records.</li>
+            <li>Automated tests included (backend, access rights and portal).</li>
+        </ul>
+    </div>
+
+    <!-- ===================== CONTACT ===================== -->
+    <div class="mb-4 bg-white p-3 text-center"
+         style="text-align: center; background: #fff; padding: 16px 20px; margin-bottom: 24px; border: 1px solid #EBEEF2; border-radius: 6px; box-shadow: 0px 8px 20px -4px rgba(0, 0, 0, 0.10);">
+        <h2 style="color: #2C3E50;">Need help or a customization?</h2>
+        <p>Installation support, training and custom features are available.</p>
+        <a href="mailto:juned.ipe@gmail.com" target="_blank"
+           style="background-color: #7f289b; display: inline-block; padding: 7px 33px; border: 1px solid #7f289b;
+                  border-radius: 35px; text-decoration: none; width: 100%; max-width: 420px; box-sizing: border-box; margin: 4px;">
+            <img style="width: 24px; vertical-align: middle;" src="./assets/icons/mail.svg" alt="Email"/>
+            <span style="color: #fff; font-size: 16px; vertical-align: middle; padding-left: 6px;">juned.ipe@gmail.com</span>
+        </a>
+        <a href="https://wa.me/8801819571653" target="_blank"
+           style="background-color: #25D366; display: inline-block; padding: 7px 33px; border: 1px solid #25D366;
+                  border-radius: 35px; text-decoration: none; width: 100%; max-width: 420px; box-sizing: border-box; margin: 4px;">
+            <img style="width: 24px; vertical-align: middle;" src="./assets/icons/chat.svg" alt="WhatsApp"/>
+            <span style="color: #fff; font-size: 15px; vertical-align: middle; padding-left: 6px;">WhatsApp: +880 1819571653</span>
+        </a>
+    </div>
+
+</section>

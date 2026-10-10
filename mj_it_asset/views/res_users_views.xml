@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- "IT ASSET PORTAL" section on the Access Rights tab, shown only for
+         portal users (Odoo hides the normal application groups for them). -->
+    <record id="view_users_form_it_asset_portal" model="ir.ui.view">
+        <field name="name">res.users.form.it.asset.portal</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='access_rights']" position="inside">
+                <group string="IT Asset Portal" name="it_asset_portal"
+                       invisible="not share" groups="base.group_erp_manager">
+                    <field name="it_asset_portal_manager"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
