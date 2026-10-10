@@ -27,7 +27,6 @@ class ItAssetAssignment(models.Model):
 
     asset_id = fields.Many2one(
         "it.asset", string="Asset", required=True, ondelete="cascade", index=True)
-    tag_no = fields.Char(related="asset_id.tag_no", store=True, string="Tag No.")
     serial_no = fields.Char(related="asset_id.serial_no", store=True, string="Serial Number")
     asset_code = fields.Char(related="asset_id.code", store=True, string="Asset Code")
     category_id = fields.Many2one(related="asset_id.category_id", store=True)

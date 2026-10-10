@@ -12,3 +12,7 @@ access_it_asset_assign_wizard_user,it.asset.assign.wizard.user,model_it_asset_as
 access_it_asset_return_wizard_user,it.asset.return.wizard.user,model_it_asset_return_wizard,group_it_asset_user,1,0,0,0
 access_it_asset_po_wizard_user,it.asset.po.wizard.user,model_it_asset_po_wizard,group_it_asset_user,1,0,0,0
 access_it_asset_po_wizard_line_user,it.asset.po.wizard.line.user,model_it_asset_po_wizard_line,group_it_asset_user,1,0,0,0
+access_it_asset_assign_wizard_manager,it.asset.assign.wizard.manager,model_it_asset_assign_wizard,group_it_asset_manager,1,1,1,1
+access_it_asset_return_wizard_manager,it.asset.return.wizard.manager,model_it_asset_return_wizard,group_it_asset_manager,1,1,1,1
+access_it_asset_po_wizard_manager,it.asset.po.wizard.manager,model_it_asset_po_wizard,group_it_asset_manager,1,1,1,1
+access_it_asset_po_wizard_line_manager,it.asset.po.wizard.line.manager,model_it_asset_po_wizard_line,group_it_asset_manager,1,1,1,1

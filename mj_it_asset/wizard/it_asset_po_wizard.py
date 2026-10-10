@@ -69,7 +69,6 @@ class ItAssetPoWizard(models.TransientModel):
                     purchase_date.date() if purchase_date else fields.Date.context_today(self))
             vals_list.append({
                 "name": line.name,
-                "tag_no": line.tag_no.strip() if line.tag_no else False,
                 "serial_no": line.serial_no.strip(),
                 "category_id": category.id,
                 "brand": line.brand,
@@ -95,7 +94,6 @@ class ItAssetPoWizardLine(models.TransientModel):
     wizard_id = fields.Many2one("it.asset.po.wizard", required=True, ondelete="cascade")
     purchase_line_id = fields.Many2one("purchase.order.line", string="PO Line")
     name = fields.Char(string="Asset Name", required=True)
-    tag_no = fields.Char(string="Tag No.")
     serial_no = fields.Char(string="Serial Number")
     category_id = fields.Many2one("it.asset.category", string="Category")
     brand = fields.Char()

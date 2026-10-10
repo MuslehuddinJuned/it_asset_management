@@ -17,7 +17,7 @@ class ItAsset(models.Model):
     _description = "IT Asset"
     _inherit = ["mail.thread", "mail.activity.mixin"]
     _order = "id desc"
-    _rec_names_search = ["name", "code", "serial_no", "tag_no"]
+    _rec_names_search = ["name", "code", "serial_no"]
 
     # ------------------------------------------------------------------
     # Identification
@@ -26,7 +26,6 @@ class ItAsset(models.Model):
         string="Asset Code", readonly=True, copy=False, index=True,
         default=lambda self: _("New"))
     name = fields.Char(string="Asset Name", required=True, tracking=True)
-    tag_no = fields.Char(string="Tag No.", tracking=True, copy=False, index=True)
     serial_no = fields.Char(
         string="Serial Number", required=True, copy=False, index=True, tracking=True)
     category_id = fields.Many2one(
@@ -106,18 +105,13 @@ class ItAsset(models.Model):
             asset.warranty_expired = bool(
                 asset.warranty_expiry and asset.warranty_expiry < today)
 
-    @api.depends("code", "name", "serial_no", "tag_no")
+    @api.depends("code", "name", "serial_no")
     def _compute_display_name(self):
         for asset in self:
             code = asset.code if asset.code and asset.code != _("New") else False
             name = f"[{code}] {asset.name}" if code else (asset.name or "")
-            details = []
-            if asset.tag_no:
-                details.append(f"Tag: {asset.tag_no}")
             if asset.serial_no:
-                details.append(f"SN: {asset.serial_no}")
-            if details:
-                name = f"{name} ({', '.join(details)})"
+                name = f"{name} (SN: {asset.serial_no})"
             asset.display_name = name
 
     # ------------------------------------------------------------------
@@ -128,8 +122,6 @@ class ItAsset(models.Model):
         for vals in vals_list:
             if vals.get("serial_no"):
                 vals["serial_no"] = vals["serial_no"].strip()
-            if vals.get("tag_no"):
-                vals["tag_no"] = vals["tag_no"].strip()
             if not vals.get("code") or vals["code"] == _("New"):
                 vals["code"] = self.env["ir.sequence"].next_by_code("it.asset") or _("New")
         return super().create(vals_list)
@@ -137,8 +129,6 @@ class ItAsset(models.Model):
     def write(self, vals):
         if vals.get("serial_no"):
             vals["serial_no"] = vals["serial_no"].strip()
-        if vals.get("tag_no"):
-            vals["tag_no"] = vals["tag_no"].strip()
         if "assignment_ids" in vals:
             # History lines edited from the asset form are saved one by one; validate
             # the overlap only once all of them are written (order-independent).
@@ -150,8 +140,10 @@ class ItAsset(models.Model):
     def _check_assignment_overlap(self):
         """An asset can be held by only one employee at a time: assignment periods
         [date_assigned, date_returned] must not overlap (touching days are allowed)."""
+        in_use = _("still in use")
+
         def _fmt(d):
-            return d.strftime("%d-%b-%Y") if d else _("still in use")
+            return d.strftime("%d-%b-%Y") if d else in_use
         for asset in self:
             lines = asset.assignment_ids.sorted(
                 lambda l: (l.date_assigned, l.date_returned or date.max, l.id))
@@ -170,8 +162,6 @@ class ItAsset(models.Model):
     def copy(self, default=None):
         default = dict(default or {})
         default.setdefault("serial_no", _("%s (copy)", self.serial_no))
-        if self.tag_no:
-            default.setdefault("tag_no", _("%s (copy)", self.tag_no))
         return super().copy(default)
 
     @api.ondelete(at_uninstall=False)

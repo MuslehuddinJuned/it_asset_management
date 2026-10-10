@@ -53,11 +53,10 @@ class TestItAssetPortal(HttpCase):
         self._post("/my/it-assets/categories", {"name": "Portal Monitor", "code": "MON"})
         self.assertTrue(self.env["it.asset.category"].search([("name", "=", "Portal Monitor")]))
         res = self._post("/my/it-assets/new", {
-            "name": "HP EliteBook", "tag_no": "PORTAL-TAG-1", "serial_no": "PORTAL-SN-1", "category_id": self.category.id})
+            "name": "HP EliteBook", "serial_no": "PORTAL-SN-1", "category_id": self.category.id})
         self.assertEqual(res.status_code, 200)
         asset = self.env["it.asset"].search([("serial_no", "=", "PORTAL-SN-1")])
         self.assertTrue(asset)
-        self.assertEqual(asset.tag_no, "PORTAL-TAG-1")
         self.assertIn(f"/my/it-assets/{asset.id}", res.url)
 
         # duplicate serial is refused with a message, not a crash
@@ -69,17 +68,15 @@ class TestItAssetPortal(HttpCase):
 
         # edit
         self._post(f"/my/it-assets/{asset.id}/edit", {
-            "name": "HP EliteBook 840", "tag_no": "PORTAL-TAG-EDITED", "serial_no": "PORTAL-SN-1",
+            "name": "HP EliteBook 840", "serial_no": "PORTAL-SN-1",
             "category_id": self.category.id, "brand": "HP"})
         self.assertEqual(asset.name, "HP EliteBook 840")
-        self.assertEqual(asset.tag_no, "PORTAL-TAG-EDITED")
         self.assertEqual(asset.brand, "HP")
 
         # detail page
         res = self.url_open(f"/my/it-assets/{asset.id}")
         self.assertEqual(res.status_code, 200)
         self.assertIn("PORTAL-SN-1", res.text)
-        self.assertIn("PORTAL-TAG-EDITED", res.text)
 
         # assign -> re-assign (employee left) -> return
         self._post(f"/my/it-assets/{asset.id}/assign", {"employee_id": self.emp.id, "condition": "new"})
@@ -184,3 +181,19 @@ class TestItAssetPortal(HttpCase):
         res = self.url_open("/my/it-assets?groupby=category")
         self.assertIn("GB-1", res.text)
         self.assertNotIn("GB-2", res.text)
+
+    def test_07_internal_readonly_user_portal(self):
+        """Internal IT Asset Users see all assets on the portal but cannot manage."""
+        self.env["res.users"].create({
+            "name": "IT Reader", "login": "it_reader_p", "password": "it_reader_p",
+            "groups_id": [(6, 0, [self.env.ref("base.group_user").id,
+                                  self.env.ref("mj_it_asset.group_it_asset_user").id])]})
+        asset = self.env["it.asset"].create({
+            "name": "RO Laptop", "serial_no": "RO-1", "category_id": self.category.id})
+        self.authenticate("it_reader_p", "it_reader_p")
+        res = self.url_open("/my/it-assets")
+        self.assertIn("RO-1", res.text)
+        self.assertNotIn("New Asset", res.text)
+        res = self._post(f"/my/it-assets/{asset.id}/status", {"action": "repair"})
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(asset.state, "available")

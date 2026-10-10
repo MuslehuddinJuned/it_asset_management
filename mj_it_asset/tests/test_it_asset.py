@@ -14,7 +14,7 @@ class TestItAsset(TransactionCase):
         cls.emp_a = cls.env["hr.employee"].create({"name": "Employee A"})
         cls.emp_b = cls.env["hr.employee"].create({"name": "Employee B"})
         cls.asset = cls.env["it.asset"].create({
-            "name": "Dell Latitude", "tag_no": "  TAG-001 ", "serial_no": "  SN-001 ", "category_id": cls.category.id})
+            "name": "Dell Latitude", "serial_no": "  SN-001 ", "category_id": cls.category.id})
 
     def _assign(self, assets, employee, **kw):
         wiz = Form(self.env["it.asset.assign.wizard"].with_context(
@@ -27,9 +27,7 @@ class TestItAsset(TransactionCase):
     def test_01_create(self):
         self.assertTrue(self.asset.code.startswith("ITA/"))
         self.assertEqual(self.asset.serial_no, "SN-001")
-        self.assertEqual(self.asset.tag_no, "TAG-001")
         self.assertEqual(self.asset.state, "available")
-        self.assertIn("Tag: TAG-001", self.asset.display_name)
 
     def test_02_unique_serial(self):
         with mute_logger("odoo.sql_db"), self.assertRaises(Exception):
@@ -41,7 +39,6 @@ class TestItAsset(TransactionCase):
         self._assign(self.asset, self.emp_a)
         self.assertEqual(self.asset.state, "assigned")
         self.assertEqual(self.asset.employee_id, self.emp_a)
-        self.assertEqual(self.asset.current_assignment_id.tag_no, "TAG-001")
         self.assertEqual(self.emp_a.it_asset_count, 1)
 
         # Employee A leaves -> hand over to B, history is kept
@@ -217,3 +214,28 @@ class TestItAsset(TransactionCase):
             self.asset.write({"assignment_ids": [(1, old.id, {"date_returned": d("2026-10-03")})]})
         self.assertIn("Employee A", str(cm.exception))
         self.assertIn("still in use", str(cm.exception))
+
+    def test_13_access_rights(self):
+        """IT Asset User: read-only. IT Asset Manager: can use the wizards."""
+        from odoo.exceptions import AccessError
+        user = self.env["res.users"].create({
+            "name": "IT Reader", "login": "it_reader_test", "email": "reader@example.com",
+            "groups_id": [(6, 0, [self.env.ref("mj_it_asset.group_it_asset_user").id])]})
+        manager = self.env["res.users"].create({
+            "name": "IT Boss", "login": "it_boss_test", "email": "boss@example.com",
+            "groups_id": [(6, 0, [self.env.ref("mj_it_asset.group_it_asset_manager").id])]})
+        self.assertTrue(self.asset.with_user(user).name)          # can read
+        with self.assertRaises(AccessError):
+            self.asset.with_user(user).write({"brand": "X"})
+        with self.assertRaises(AccessError):
+            self.env["it.asset.assign.wizard"].with_user(user).create({
+                "asset_ids": [(6, 0, self.asset.ids)], "employee_id": self.emp_a.id})
+        # manager runs the wizard end to end
+        wiz = self.env["it.asset.assign.wizard"].with_user(manager).create({
+            "asset_ids": [(6, 0, self.asset.ids)], "employee_id": self.emp_a.id})
+        wiz.action_confirm()
+        self.assertEqual(self.asset.employee_id, self.emp_a)
+        ret = self.env["it.asset.return.wizard"].with_user(manager).create({
+            "asset_ids": [(6, 0, self.asset.ids)], "reason": "other"})
+        ret.action_confirm()
+        self.assertEqual(self.asset.state, "available")
