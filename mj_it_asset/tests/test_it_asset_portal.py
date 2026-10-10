@@ -1,4 +1,3 @@
-from odoo import http
 from odoo.tests import HttpCase, tagged
 
 
@@ -34,7 +33,7 @@ class TestItAssetPortal(HttpCase):
         })
 
     def _post(self, url, data):
-        data = dict(data, csrf_token=http.Request.csrf_token(self))
+        data = dict(data, csrf_token=self.csrf_token())
         return self.url_open(url, data=data)
 
     def test_01_toggle(self):
@@ -173,6 +172,10 @@ class TestItAssetPortal(HttpCase):
         self.assertIn("Group By", res.text)
         res = self.url_open("/my/it-assets?groupby=state")
         self.assertIn("Assigned", res.text)
+        # state badges are rendered and the breadcrumb is shown only once
+        res = self.url_open("/my/it-assets")
+        self.assertIn("badge rounded-pill text-bg-info", res.text)
+        self.assertEqual(res.text.count("o_portal_submenu"), 1)
         for gb in ["none", "asset", "employee", "department", "category", "reason", "state"]:
             res = self.url_open(f"/my/it-assets/history?groupby={gb}")
             self.assertEqual(res.status_code, 200, gb)

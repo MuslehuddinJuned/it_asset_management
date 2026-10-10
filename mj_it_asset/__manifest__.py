@@ -1,6 +1,6 @@
 {
     "name": "IT Asset Management",
-    "version": "19.0.1.0.0",
+    "version": "20.0.1.0.0",
     "summary": "Track IT assets by serial number, assign them to employees "
                "with full history and link them to Purchase Orders",
     "description": """
@@ -22,8 +22,9 @@ IT Asset Management
     "depends": ["base", "mail", "hr", "purchase", "portal"],
     "data": [
         "security/security.xml",
-        "security/ir.model.access.csv",
+        "security/ir.access.csv",
         "data/ir_sequence.xml",
+        "data/portal_entry_data.xml",
         "wizard/it_asset_assign_wizard_views.xml",
         "wizard/it_asset_return_wizard_views.xml",
         "wizard/it_asset_po_wizard_views.xml",

@@ -98,7 +98,7 @@ class ItAssetPortal(CustomerPortal):
             if field.type == "selection" else {}
         groups = []
         for key, recs in itergroupby(records, key=lambda r: r[field_name]):
-            recs = Model.concat(*recs)
+            recs = Model.concat(recs)
             if field.type == "selection":
                 label = selection.get(key) or _("None")
             else:
@@ -139,13 +139,12 @@ class ItAssetPortal(CustomerPortal):
     # ------------------------------------------------------------------
     # Portal home counter
     # ------------------------------------------------------------------
-    def _prepare_home_portal_values(self, counters):
-        values = super()._prepare_home_portal_values(counters)
-        if "it_asset_count" in counters:
+    def _prepare_portal_counter_values(self, counter):
+        if counter == "it_asset_count":
             domain = self._it_asset_domain()
-            values["it_asset_count"] = (
-                request.env["it.asset"].sudo().search_count(domain) if domain is not None else 0)
-        return values
+            if domain is not None:
+                return "it.asset", domain, "sudo"
+        return super()._prepare_portal_counter_values(counter)
 
     # ------------------------------------------------------------------
     # List

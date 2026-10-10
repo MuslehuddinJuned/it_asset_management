@@ -145,16 +145,20 @@ class TestItAsset(TransactionCase):
         self.env.flush_all()
         self.env.cr.precommit.run()   # tracking values are written at commit time
         self.env.invalidate_all()     # the form view had cached the (empty) chatter
-        tracked = current.message_ids.tracking_value_ids.mapped("field_id.name")
-        self.assertIn("employee_id", tracked)
-        self.assertIn("condition_out", tracked)
+        # Odoo 20: tracked changes are written in the chatter message body
+        # (structured values need the optional "mail_tracking" module)
+        tracked = " ".join(str(m.body) for m in current.message_ids if m.message_type == "tracking")
+        self.assertIn("Employee C", tracked)
+        self.assertIn("(Employee)", tracked)
+        self.assertIn("(Condition (Given))", tracked)
         self.assertTrue(any("corrected" in (m.body or "") for m in self.asset.message_ids))
         # edit the old (returned) line too
         old.write({"return_reason": "upgrade", "return_note": "fixed reason"})
         self.env.flush_all()
         self.env.cr.precommit.run()
         self.env.invalidate_all()
-        self.assertIn("return_reason", old.message_ids.tracking_value_ids.mapped("field_id.name"))
+        self.assertIn("(Return Reason)", " ".join(
+            str(m.body) for m in old.message_ids if m.message_type == "tracking"))
 
     def test_10_history_edit_validation(self):
         from odoo.exceptions import ValidationError

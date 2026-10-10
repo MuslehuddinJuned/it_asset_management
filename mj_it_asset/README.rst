@@ -2,8 +2,8 @@
 IT Asset Management
 =====================
 
-.. |badge1| image:: https://img.shields.io/badge/odoo-19.0-875A7B.svg
-    :alt: Odoo 19.0
+.. |badge1| image:: https://img.shields.io/badge/odoo-20.0-875A7B.svg
+    :alt: Odoo 20.0
 .. |badge2| image:: https://img.shields.io/badge/licence-LGPL--3-blue.svg
     :target: https://www.gnu.org/licenses/lgpl-3.0-standalone.html
     :alt: License: LGPL-3
@@ -114,9 +114,10 @@ Usage
 Technical notes
 ===============
 
-* Developed and tested on Odoo 19.0 (Community & Enterprise).
-* Odoo 19 security model: *privileges* (``res.groups.privilege``), ``group_ids``, ``models.Constraint``.
-* Compatible with the Odoo 19 employee *versions* (department / job snapshot) and the Purchase Order lock flag.
+* Developed and tested on Odoo 20.0 (Community & Enterprise).
+* Odoo 20 unified access model: ``security/ir.access.csv`` (permissions and multi-company restrictions).
+* Portal home card defined as a ``portal.entry`` record; templates use the Odoo 20 ``t-call`` parameters.
+* Field changes are logged in the chatter out of the box; install the optional *Discuss Tracking* (``mail_tracking``) app if you also want the structured tracking table.
 * Standalone models: ``it.asset``, ``it.asset.assignment``, ``it.asset.category``; no dependency on Products or Accounting Assets.
 * Depends on ``hr``, ``purchase``, ``portal`` and ``mail`` - all available in Odoo Community.
 * Portal pages check access explicitly (manager / employee / company) before reading or writing records.

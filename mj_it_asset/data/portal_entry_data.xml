@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Odoo 20: portal home cards are portal.entry records -->
+    <record id="portal_entry_it_assets" model="portal.entry">
+        <field name="name">IT Assets</field>
+        <field name="description">IT equipment: register, assign and track assets</field>
+        <field name="url">/my/it-assets</field>
+        <field name="image" type="bytes" file="mj_it_asset/static/src/img/portal_icon.svg"/>
+        <field name="placeholder_count">it_asset_count</field>
+        <field name="category">common_category</field>
+        <field name="sequence" eval="160"/>
+    </record>
+</odoo>

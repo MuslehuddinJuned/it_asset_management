@@ -40,16 +40,5 @@ Deleting is reserved to Settings / Administration.</field>
 return IT assets, and create assets from Purchase Orders, from the customer portal.</field>
     </record>
 
-    <!-- Multi-company rules -->
-    <record id="it_asset_company_rule" model="ir.rule">
-        <field name="name">IT Asset: multi-company</field>
-        <field name="model_id" ref="model_it_asset"/>
-        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-    </record>
-
-    <record id="it_asset_assignment_company_rule" model="ir.rule">
-        <field name="name">IT Asset Assignment: multi-company</field>
-        <field name="model_id" ref="model_it_asset_assignment"/>
-        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-    </record>
+    <!-- Access rights and multi-company restrictions: security/ir.access.csv (Odoo 20) -->
 </odoo>
