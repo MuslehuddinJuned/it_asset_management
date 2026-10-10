@@ -4,9 +4,10 @@
         <field name="name">it.asset.assignment.tree</field>
         <field name="model">it.asset.assignment</field>
         <field name="arch" type="xml">
-            <list create="false" decoration-success="state == 'active'" decoration-muted="state == 'returned'">
+            <tree create="false" decoration-success="state == 'active'" decoration-muted="state == 'returned'">
                 <field name="asset_code"/>
                 <field name="asset_id"/>
+                <field name="tag_no" optional="show"/>
                 <field name="serial_no"/>
                 <field name="category_id" optional="show"/>
                 <field name="employee_id"/>
@@ -22,7 +23,7 @@
                 <field name="returned_by" widget="many2one_avatar_user" optional="hide"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide"/>
                 <field name="state" widget="badge" decoration-success="state == 'active'"/>
-            </list>
+            </tree>
         </field>
     </record>
 
@@ -42,6 +43,7 @@
                     <group>
                         <group string="Asset">
                             <field name="asset_id" readonly="1"/>
+                            <field name="tag_no" readonly="1"/>
                             <field name="serial_no"/>
                             <field name="category_id"/>
                             <field name="company_id" invisible="1"/>
@@ -67,7 +69,11 @@
                         </group>
                     </group>
                 </sheet>
-                <chatter/>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>
@@ -78,6 +84,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="asset_id"/>
+                <field name="tag_no"/>
                 <field name="serial_no"/>
                 <field name="employee_id"/>
                 <field name="department_id"/>
@@ -86,7 +93,7 @@
                 <separator/>
                 <filter name="date_assigned" string="Assigned Date" date="date_assigned"/>
                 <filter name="date_returned" string="Returned Date" date="date_returned"/>
-                <group>
+                <group expand="0" string="Group By">
                     <filter name="group_asset" string="Asset" context="{'group_by': 'asset_id'}"/>
                     <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
                     <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>
@@ -100,7 +107,7 @@
     <record id="action_it_asset_assignment" model="ir.actions.act_window">
         <field name="name">Assignment History</field>
         <field name="res_model">it.asset.assignment</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="view_it_asset_assignment_search"/>
         <field name="context">{'create': False}</field>
     </record>

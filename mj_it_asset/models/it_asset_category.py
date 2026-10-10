@@ -13,7 +13,9 @@ class ItAssetCategory(models.Model):
     asset_ids = fields.One2many("it.asset", "category_id", string="Assets")
     asset_count = fields.Integer(compute="_compute_asset_count")
 
-    _name_uniq = models.Constraint("unique(name)", "Category name must be unique!")
+    _sql_constraints = [
+        ("name_uniq", "unique(name)", "Category name must be unique!"),
+    ]
 
     @api.depends("asset_ids")
     def _compute_asset_count(self):

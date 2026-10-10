@@ -19,17 +19,18 @@
                     </group>
                 </group>
                 <field name="line_ids">
-                    <list editable="bottom">
+                    <tree editable="bottom">
                         <field name="purchase_line_id" readonly="1" force_save="1"
                                options="{'no_open': True}" optional="show"/>
                         <field name="name"/>
+                        <field name="tag_no" optional="show"/>
                         <field name="serial_no" required="1"/>
                         <field name="category_id" options="{'no_create': True}"/>
                         <field name="brand" optional="show"/>
                         <field name="model_no" optional="show"/>
                         <field name="warranty_expiry" optional="hide"/>
                         <field name="purchase_value" optional="show"/>
-                    </list>
+                    </tree>
                 </field>
                 <footer>
                     <button name="action_confirm" type="object" string="Create Assets" class="btn-primary"/>

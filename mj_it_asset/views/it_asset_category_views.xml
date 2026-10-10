@@ -4,12 +4,12 @@
         <field name="name">it.asset.category.tree</field>
         <field name="model">it.asset.category</field>
         <field name="arch" type="xml">
-            <list editable="bottom">
+            <tree editable="bottom">
                 <field name="name"/>
                 <field name="code"/>
                 <field name="asset_count"/>
                 <field name="active" widget="boolean_toggle"/>
-            </list>
+            </tree>
         </field>
     </record>
 
@@ -38,6 +38,6 @@
     <record id="action_it_asset_category" model="ir.actions.act_window">
         <field name="name">Categories</field>
         <field name="res_model">it.asset.category</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">tree,form</field>
     </record>
 </odoo>

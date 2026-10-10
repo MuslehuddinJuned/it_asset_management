@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- ================================================================
-         Breadcrumbs (the home card is the portal.entry record in
-         data/portal_entry_data.xml since Odoo 20)
+         Portal home card + breadcrumbs
          ================================================================ -->
+    <template id="portal_my_home_it_asset" name="Show IT Assets" inherit_id="portal.portal_my_home"
+              customize_show="True" priority="40">
+        <div id="portal_common_category" position="inside">
+            <t t-set="it_mgr" t-value="request.env.user.has_group('mj_it_asset.group_it_asset_portal_manager') or request.env.user.has_group('mj_it_asset.group_it_asset_user')"/>
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/mj_it_asset/static/src/img/portal_icon.svg'"/>
+                <t t-set="title">IT Assets</t>
+                <t t-set="text" t-if="it_mgr">Register, assign and track IT assets</t>
+                <t t-set="text" t-else="">IT equipment assigned to you</t>
+                <t t-set="url" t-value="'/my/it-assets'"/>
+                <t t-set="placeholder_count" t-value="'it_asset_count'"/>
+                <t t-set="config_card" t-value="it_mgr"/>
+            </t>
+        </div>
+    </template>
 
     <template id="portal_breadcrumbs_it_asset" name="Portal layout: IT asset entries"
               inherit_id="portal.portal_breadcrumbs" priority="40">
@@ -56,8 +70,11 @@
          List
          ================================================================ -->
     <template id="portal_my_it_assets" name="My IT Assets">
-        <t t-call="portal.portal_layout" breadcrumbs_searchbar="True">
-            <t t-call="portal.portal_searchbar" breadcrumbs_searchbar="True" title.translate="IT Assets"/>
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">IT Assets</t>
+            </t>
             <t t-call="mj_it_asset.portal_it_asset_alerts"/>
             <t t-call="mj_it_asset.portal_it_asset_nav"/>
             <div t-if="not assets" class="alert alert-info">No IT assets found.</div>
@@ -66,6 +83,7 @@
                     <tr class="active">
                         <th>Code</th>
                         <th>Asset</th>
+                        <th>Tag No.</th>
                         <th>Serial Number</th>
                         <th class="d-none d-md-table-cell">Category</th>
                         <th>Assigned To</th>
@@ -75,7 +93,7 @@
                 </thead>
                 <tbody t-foreach="grouped_assets" t-as="grp">
                     <tr t-if="grp[0] is not None" class="table-light">
-                        <th colspan="7">
+                        <th colspan="8">
                             <i class="fa fa-folder-open-o me-1"/><t t-out="grp[0]"/>
                             <span class="badge rounded-pill text-bg-secondary ms-1" t-out="grp[1]"/>
                         </th>
@@ -83,6 +101,7 @@
                     <tr t-foreach="grp[2]" t-as="a">
                         <td><a t-attf-href="/my/it-assets/#{a.id}" t-out="a.code"/></td>
                         <td><a t-attf-href="/my/it-assets/#{a.id}" t-out="a.name"/></td>
+                        <td><span t-out="a.tag_no or '-'"/></td>
                         <td><code t-out="a.serial_no"/></td>
                         <td class="d-none d-md-table-cell" t-out="a.category_id.name"/>
                         <td>
@@ -91,7 +110,7 @@
                         </td>
                         <td class="d-none d-lg-table-cell" t-out="a.purchase_order_id.name"/>
                         <td class="text-end">
-                            <t t-call="mj_it_asset.portal_it_asset_state_badge" state="a.state"/>
+                            <t t-call="mj_it_asset.portal_it_asset_state_badge"><t t-set="state" t-value="a.state"/></t>
                         </td>
                     </tr>
                 </tbody>
@@ -111,10 +130,10 @@
                 <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
                     <div>
                         <h4 class="mb-0"><t t-out="asset.name"/></h4>
-                        <small class="text-muted"><t t-out="asset.code"/> · SN: <code t-out="asset.serial_no"/></small>
+                        <small class="text-muted"><t t-out="asset.code"/><t t-if="asset.tag_no"> · Tag: <span t-out="asset.tag_no"/></t> · SN: <code t-out="asset.serial_no"/></small>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <t t-call="mj_it_asset.portal_it_asset_state_badge" state="asset.state"/>
+                        <t t-call="mj_it_asset.portal_it_asset_state_badge"><t t-set="state" t-value="asset.state"/></t>
                         <a t-if="it_is_manager" t-attf-href="/my/it-assets/#{asset.id}/edit"
                            class="btn btn-sm btn-secondary"><i class="fa fa-pencil me-1"/>Edit</a>
                     </div>
@@ -129,7 +148,8 @@
                                 <div class="col-md-6">
                                     <h6 class="text-uppercase text-muted small">Identification</h6>
                                     <table class="table table-sm table-borderless mb-3">
-                                        <tr><th class="w-50">Category</th><td t-out="asset.category_id.name"/></tr>
+                                        <tr><th class="w-50">Tag No.</th><td t-out="asset.tag_no or '-'"/></tr>
+                                        <tr><th>Category</th><td t-out="asset.category_id.name"/></tr>
                                         <tr><th>Brand</th><td t-out="asset.brand"/></tr>
                                         <tr><th>Model</th><td t-out="asset.model_no"/></tr>
                                         <tr><th>Location</th><td t-out="asset.location"/></tr>
@@ -355,6 +375,12 @@
                                            t-att-value="f.get('name', asset.name if asset else '')"/>
                                 </div>
                                 <div class="mb-2">
+                                    <label class="form-label" for="tag_no">Tag No.</label>
+                                    <input type="text" name="tag_no" id="tag_no" class="form-control"
+                                           placeholder="e.g. TAG-00123"
+                                           t-att-value="f.get('tag_no', (asset.tag_no or '') if asset else '')"/>
+                                </div>
+                                <div class="mb-2">
                                     <label class="form-label" for="serial_no">Serial Number *</label>
                                     <input type="text" name="serial_no" id="serial_no" class="form-control" required="required"
                                            t-att-value="f.get('serial_no', asset.serial_no if asset else '')"/>
@@ -481,8 +507,11 @@
          Assignment history
          ================================================================ -->
     <template id="portal_it_asset_history" name="IT Asset assignment history">
-        <t t-call="portal.portal_layout" breadcrumbs_searchbar="True">
-            <t t-call="portal.portal_searchbar" breadcrumbs_searchbar="True" title.translate="Assignment History"/>
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Assignment History</t>
+            </t>
             <t t-call="mj_it_asset.portal_it_asset_alerts"/>
             <t t-call="mj_it_asset.portal_it_asset_nav"/>
             <div t-if="not lines" class="alert alert-info">No assignment history found.</div>
@@ -490,6 +519,7 @@
                 <thead>
                     <tr class="active">
                         <th>Asset</th>
+                        <th>Tag No.</th>
                         <th>Serial Number</th>
                         <th>Employee</th>
                         <th class="d-none d-md-table-cell">Department</th>
@@ -501,7 +531,7 @@
                 </thead>
                 <tbody t-foreach="grouped_lines" t-as="grp">
                     <tr t-if="grp[0] is not None" class="table-light">
-                        <th colspan="8">
+                        <th colspan="9">
                             <i class="fa fa-folder-open-o me-1"/><t t-out="grp[0]"/>
                             <span class="badge rounded-pill text-bg-secondary ms-1" t-out="grp[1]"/>
                         </th>
@@ -513,6 +543,7 @@
                             </a>
                             <t t-else=""><t t-out="h.asset_code"/> <t t-out="h.asset_id.name"/></t>
                         </td>
+                        <td><span t-out="h.tag_no or '-'"/></td>
                         <td><code t-out="h.serial_no"/></td>
                         <td t-out="h.employee_id.name"/>
                         <td class="d-none d-md-table-cell" t-out="h.department_id.name"/>
@@ -636,6 +667,7 @@
                                     <th></th>
                                     <th>PO Line</th>
                                     <th>Asset Name</th>
+                                    <th>Tag No.</th>
                                     <th>Serial Number *</th>
                                     <th>Category</th>
                                     <th>Brand</th>
@@ -655,6 +687,8 @@
                                     <td class="small" t-out="row['po_line_label']"/>
                                     <td><input type="text" class="form-control form-control-sm" t-att-name="'name_%s' % i"
                                                t-att-value="post.get('name_%s' % i, row['name'])"/></td>
+                                    <td><input type="text" class="form-control form-control-sm" t-att-name="'tag_%s' % i"
+                                               t-att-value="post.get('tag_%s' % i, '')" placeholder="Tag No."/></td>
                                     <td><input type="text" class="form-control form-control-sm" t-att-name="'serial_%s' % i"
                                                t-att-value="post.get('serial_%s' % i, '')"/></td>
                                     <td>

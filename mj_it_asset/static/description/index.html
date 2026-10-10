@@ -13,7 +13,7 @@
             and IT vendors work from the portal.
         </p>
         <div>
-            <span style="display: inline-block; background-color: #ffffff; color: #50286E; border-radius: 20px; padding: 3px 14px; margin: 3px; font-size: 13px; font-weight: 600;">Odoo 20.0</span>
+            <span style="display: inline-block; background-color: #ffffff; color: #50286E; border-radius: 20px; padding: 3px 14px; margin: 3px; font-size: 13px; font-weight: 600;">Odoo 17.0</span>
             <span style="display: inline-block; background-color: #ffffff; color: #50286E; border-radius: 20px; padding: 3px 14px; margin: 3px; font-size: 13px; font-weight: 600;">Community &amp; Enterprise</span>
             <span style="display: inline-block; background-color: #ffffff; color: #50286E; border-radius: 20px; padding: 3px 14px; margin: 3px; font-size: 13px; font-weight: 600;">Backend + Portal</span>
             <span style="display: inline-block; background-color: #ffffff; color: #50286E; border-radius: 20px; padding: 3px 14px; margin: 3px; font-size: 13px; font-weight: 600;">LGPL-3</span>
@@ -227,10 +227,8 @@
          style="background: #fff; padding: 16px 20px; margin-bottom: 24px; border: 1px solid #EBEEF2; border-radius: 6px; box-shadow: 0px 8px 20px -4px rgba(0, 0, 0, 0.10);">
         <h2 style="color: #2C3E50;">Technical Notes</h2>
         <ul>
-            <li>Developed and tested on Odoo 20.0 (Community &amp; Enterprise).</li>
-            <li>Odoo 20 unified access model: <code>security/ir.access.csv</code> (permissions and multi-company restrictions).</li>
-            <li>Portal home card defined as a <code>portal.entry</code> record; templates use the Odoo 20 <code>t-call</code> parameters.</li>
-            <li>Field changes are logged in the chatter out of the box; install the optional <i>Discuss Tracking</i> (<code>mail_tracking</code>) app if you also want the structured tracking table.</li>
+            <li>Developed and tested on Odoo 17.0 (Community &amp; Enterprise).</li>
+            <li>Odoo 17 view syntax (<code>invisible</code> / <code>readonly</code> expressions), classic access rules (<code>ir.model.access.csv</code> + record rules).</li>
             <li>Standalone models: <code>it.asset</code>, <code>it.asset.assignment</code>, <code>it.asset.category</code>; no dependency on Products or Accounting Assets.</li>
             <li>Depends on <code>hr</code>, <code>purchase</code>, <code>portal</code> and <code>mail</code> &ndash; all available in Odoo Community.</li>
             <li>Portal pages check access explicitly (manager / employee / company) before reading or writing records.</li>

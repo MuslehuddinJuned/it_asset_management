@@ -16,13 +16,14 @@
                     </group>
                 </group>
                 <field name="asset_ids" options="{'no_create': True}">
-                    <list>
+                    <tree>
                         <field name="code"/>
                         <field name="name"/>
+                        <field name="tag_no" optional="show"/>
                         <field name="serial_no"/>
                         <field name="employee_id" string="Current Holder"/>
                         <field name="assigned_date"/>
-                    </list>
+                    </tree>
                 </field>
                 <field name="note" placeholder="Return note (missing accessories, damages, etc.)"/>
                 <footer>

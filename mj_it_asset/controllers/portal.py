@@ -16,8 +16,7 @@ class ItAssetPortal(CustomerPortal):
     """Portal pages for IT assets.
 
     * Portal managers (group ``group_it_asset_portal_manager``) and internal IT
-      Asset Managers can fully manage assets of their allowed companies.
-    * Internal IT Asset Users (read-only) can view all assets of their companies.
+      asset users can fully manage assets of their allowed companies.
     * Any other portal user linked to an employee (employee.user_id or
       employee.work_contact_id) can view the assets assigned to them.
 
@@ -29,14 +28,9 @@ class ItAssetPortal(CustomerPortal):
     # Access helpers
     # ------------------------------------------------------------------
     def _it_is_manager(self):
-        """Can add / edit / assign / return assets from the portal."""
         user = request.env.user
         return (user.has_group("mj_it_asset.group_it_asset_portal_manager")
-                or user.has_group("mj_it_asset.group_it_asset_manager"))
-
-    def _it_can_view_all(self):
-        """Read-only IT Asset Users see every asset of their companies."""
-        return self._it_is_manager() or request.env.user.has_group("mj_it_asset.group_it_asset_user")
+                or user.has_group("mj_it_asset.group_it_asset_user"))
 
     def _it_company_ids(self):
         return request.env.user.company_ids.ids
@@ -48,7 +42,7 @@ class ItAssetPortal(CustomerPortal):
 
     def _it_asset_domain(self):
         """Domain of assets visible to the current user, or None (no access)."""
-        if self._it_can_view_all():
+        if self._it_is_manager():
             return [("company_id", "in", self._it_company_ids())]
         employees = self._it_my_employees()
         if employees:
@@ -56,7 +50,7 @@ class ItAssetPortal(CustomerPortal):
         return None
 
     def _it_assignment_domain(self):
-        if self._it_can_view_all():
+        if self._it_is_manager():
             return [("company_id", "in", self._it_company_ids())]
         employees = self._it_my_employees()
         if employees:
@@ -98,7 +92,7 @@ class ItAssetPortal(CustomerPortal):
             if field.type == "selection" else {}
         groups = []
         for key, recs in itergroupby(records, key=lambda r: r[field_name]):
-            recs = Model.concat(recs)
+            recs = Model.concat(*recs)
             if field.type == "selection":
                 label = selection.get(key) or _("None")
             else:
@@ -117,7 +111,7 @@ class ItAssetPortal(CustomerPortal):
     def _it_purchase_orders(self):
         return request.env["purchase.order"].sudo().search([
             ("company_id", "in", self._it_company_ids()),
-            ("state", "=", "purchase")], order="date_order desc, id desc", limit=300)
+            ("state", "in", ("purchase", "done"))], order="date_order desc, id desc", limit=300)
 
     def _it_vendors(self):
         return request.env["res.partner"].sudo().search(
@@ -139,12 +133,13 @@ class ItAssetPortal(CustomerPortal):
     # ------------------------------------------------------------------
     # Portal home counter
     # ------------------------------------------------------------------
-    def _prepare_portal_counter_values(self, counter):
-        if counter == "it_asset_count":
+    def _prepare_home_portal_values(self, counters):
+        values = super()._prepare_home_portal_values(counters)
+        if "it_asset_count" in counters:
             domain = self._it_asset_domain()
-            if domain is not None:
-                return "it.asset", domain, "sudo"
-        return super()._prepare_portal_counter_values(counter)
+            values["it_asset_count"] = (
+                request.env["it.asset"].sudo().search_count(domain) if domain is not None else 0)
+        return values
 
     # ------------------------------------------------------------------
     # List
@@ -161,13 +156,14 @@ class ItAssetPortal(CustomerPortal):
         searchbar_sortings = {
             "newest": {"label": _("Newest"), "order": "id desc"},
             "code": {"label": _("Asset Code"), "order": "code asc"},
+            "tag": {"label": _("Tag No."), "order": "tag_no asc, id desc"},
             "name": {"label": _("Name"), "order": "name asc, id desc"},
             "employee": {"label": _("Employee"), "order": "employee_id, id desc"},
         }
         searchbar_filters = {"all": {"label": _("All"), "domain": []}}
         for key, label in ASSET_STATES:
             searchbar_filters[key] = {"label": label, "domain": [("state", "=", key)]}
-        searchbar_inputs = {"all": {"input": "all", "label": _("Search in Name / Code / Serial / Employee")}}
+        searchbar_inputs = {"all": {"input": "all", "label": _("Search in Name / Code / Tag / Serial / Employee")}}
         searchbar_groupby = {
             "none": {"input": "none", "label": _("None"), "field": False},
             "state": {"input": "state", "label": _("Status"), "field": "state"},
@@ -185,8 +181,9 @@ class ItAssetPortal(CustomerPortal):
         filterby = filterby if filterby in searchbar_filters else "all"
         domain = domain + searchbar_filters[filterby]["domain"]
         if search:
-            domain += ["|", "|", "|",
+            domain += ["|", "|", "|", "|",
                        ("name", "ilike", search), ("code", "ilike", search),
+                       ("tag_no", "ilike", search),
                        ("serial_no", "ilike", search), ("employee_id.name", "ilike", search)]
 
         total = Asset.search_count(domain)
@@ -253,6 +250,7 @@ class ItAssetPortal(CustomerPortal):
 
         vals = {
             "name": (post.get("name") or "").strip(),
+            "tag_no": (post.get("tag_no") or "").strip() or False,
             "serial_no": (post.get("serial_no") or "").strip(),
             "category_id": _int("category_id"),
             "brand": (post.get("brand") or "").strip() or False,
@@ -436,8 +434,9 @@ class ItAssetPortal(CustomerPortal):
         filterby = filterby if filterby in searchbar_filters else "all"
         domain = domain + searchbar_filters[filterby]["domain"]
         if search:
-            domain += ["|", "|", "|",
+            domain += ["|", "|", "|", "|",
                        ("asset_id.name", "ilike", search), ("asset_code", "ilike", search),
+                       ("tag_no", "ilike", search),
                        ("serial_no", "ilike", search), ("employee_id.name", "ilike", search)]
         total = Assignment.search_count(domain)
         pager = portal_pager(url="/my/it-assets/history", total=total, page=page, step=PAGE_SIZE,
@@ -505,6 +504,7 @@ class ItAssetPortal(CustomerPortal):
                     lines.append((0, 0, {
                         "purchase_line_id": int(post[f"line_{i}"]) or False,
                         "name": (post.get(f"name_{i}") or "").strip() or _("IT Asset"),
+                        "tag_no": (post.get(f"tag_{i}") or "").strip() or False,
                         "serial_no": (post.get(f"serial_{i}") or "").strip(),
                         "category_id": int(post.get(f"category_{i}") or 0) or False,
                         "brand": post.get(f"brand_{i}") or False,
